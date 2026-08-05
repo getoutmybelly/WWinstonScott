@@ -1,0 +1,13 @@
+name = "winston-field-notes-publisher"
+main = "src/index.js"
+compatibility_date = "2026-08-04"
+workers_dev = true
+
+[vars]
+LINKEDIN_REDIRECT_URI = "https://winston-field-notes-publisher.michelle-cb4.workers.dev/linkedin/callback"
+
+# Run `npx wrangler kv namespace create LINKEDIN_STORE`, then replace the
+# placeholder below with the namespace ID returned by Cloudflare.
+[[kv_namespaces]]
+binding = "LINKEDIN_STORE"
+id = "REPLACE_WITH_KV_NAMESPACE_ID"
