@@ -50,7 +50,7 @@ test("publisher stays locked until the admin password is supplied", async () => 
   const body = await unlocked.text();
   assert.match(body, /LinkedIn is not connected/);
   assert.match(body, /Copy &amp; Open Personal Facebook/);
-  assert.match(body, /Facebook requires you to make the final post on a personal profile/);
+  assert.match(body, /Facebook requires you to make the final post on a personal profile/);\n  assert.match(body, /https:\\/\\/www\\.facebook\\.com\\/WayneScottII/);
 });
 
 test("same-origin login works when the browser serializes Origin as null", async () => {
