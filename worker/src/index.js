@@ -101,7 +101,7 @@ if(fb)fb.addEventListener('click',async()=>{
   if(!post){fs.textContent='Add your approved Facebook text first.';f.focus();return;}
   const link=article.value.trim();
   const shareText=[post,link].filter(Boolean).join('\n\n');
-  window.open('https://www.facebook.com/','_blank','noopener,noreferrer');
+  window.open('https://www.facebook.com/WayneScottII','_blank','noopener,noreferrer');
   try{await navigator.clipboard.writeText(shareText);fs.textContent='Copied. Paste into the Facebook composer, review it, and press Post when ready.';}
   catch{fs.textContent='Facebook opened, but your browser blocked copying. Select and copy the Facebook text manually.';}
 });
