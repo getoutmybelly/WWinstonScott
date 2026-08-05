@@ -284,7 +284,18 @@ async function safeEqual(a, b) {
 
 function requireSameOrigin(request) {
   const origin = request.headers.get("Origin");
-  if (origin && origin !== new URL(request.url).origin) throw new Error("Cross-origin request blocked");
+  const requestOrigin = new URL(request.url).origin;
+  if (origin && origin !== "null") {
+    if (origin !== requestOrigin) throw new Error("Cross-origin request blocked");
+    return;
+  }
+
+  // Browsers can serialize Origin as "null" when a strict referrer policy is
+  // active. Fetch Metadata still identifies a genuine same-origin form post.
+  const fetchSite = request.headers.get("Sec-Fetch-Site");
+  if (origin === "null" && fetchSite !== "same-origin") {
+    throw new Error("Cross-origin request blocked");
+  }
 }
 
 function requireEnv(env, names) {
@@ -327,7 +338,7 @@ function withHeaders(response, headers) { const output = new Response(response.b
 function securityHeaders() {
   return {
     "Content-Security-Policy": "default-src 'self'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; form-action 'self'; frame-ancestors 'none'; base-uri 'none'",
-    "Referrer-Policy": "no-referrer",
+    "Referrer-Policy": "same-origin",
     "X-Content-Type-Options": "nosniff",
     "X-Frame-Options": "DENY",
     "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
