@@ -50,6 +50,22 @@ test("publisher stays locked until the admin password is supplied", async () => 
   assert.match(await unlocked.text(), /LinkedIn is not connected/);
 });
 
+test("same-origin login works when the browser serializes Origin as null", async () => {
+  const env = environment();
+  const response = await worker.fetch(new Request(`${ORIGIN}/api/login`, {
+    method: "POST",
+    headers: {
+      Origin: "null",
+      "Sec-Fetch-Site": "same-origin",
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+    body: new URLSearchParams({ password: env.ADMIN_PASSWORD }),
+  }), env);
+
+  assert.equal(response.status, 303);
+  assert.match(response.headers.get("set-cookie"), /__Host-wfn_admin=/);
+});
+
 test("LinkedIn connection requests the identity and publishing scopes", async () => {
   const env = environment();
   const sessionCookie = await unlock(env);
