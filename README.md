@@ -7,7 +7,9 @@ Personal site and Field Notes publishing tools.
 The `worker/` directory contains a dedicated Cloudflare Worker for approving
 and publishing posts to W. Winston Scott's personal LinkedIn profile. It keeps
 LinkedIn credentials and access tokens server-side and never auto-publishes a
-draft.
+draft. The same approval desk also prepares a separate personal-Facebook
+version, copies it with the optional article link, and opens Facebook so the
+account owner can make the platform-required final post manually.
 
 ### One-time Cloudflare setup
 
