@@ -10,6 +10,7 @@
     "deploy": "wrangler deploy"
   },
   "devDependencies": {
+    "@types/node": "^26.1.2",
     "wrangler": "^4.28.1"
   }
 }

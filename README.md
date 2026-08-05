@@ -11,16 +11,19 @@ draft.
 
 ### One-time Cloudflare setup
 
-Run these commands from `worker/` on a computer authenticated to the correct
-Cloudflare account:
+Cloudflare Workers Builds can deploy the `worker/` directory directly from
+this repository. Use these deployment settings:
 
-```bash
-npm install
-npx wrangler kv namespace create LINKEDIN_STORE
-```
+- Project name: `winston-field-notes-publisher`
+- Production branch: `main`
+- Root directory: `worker`
+- Build command: leave blank
+- Deploy command: `npx wrangler deploy`
 
-Put the returned KV namespace ID into `worker/wrangler.toml`, replacing
-`REPLACE_WITH_KV_NAMESPACE_ID`. Then create the four encrypted Worker secrets:
+The `LINKEDIN_STORE` KV namespace is declared without an account-specific ID,
+so current Wrangler versions provision and bind it automatically on the first
+deployment. After that deployment, create these four encrypted Worker secrets
+in the Cloudflare dashboard:
 
 ```bash
 npx wrangler secret put LINKEDIN_CLIENT_ID
@@ -34,7 +37,7 @@ npx wrangler secret put SESSION_SECRET
 - `ADMIN_PASSWORD` is a new password used only to unlock the publisher.
 - `SESSION_SECRET` should be a new random value of at least 32 characters.
 
-Do not commit any of these values. Deploy with:
+Do not commit any of these values. Local validation commands are:
 
 ```bash
 npm run check

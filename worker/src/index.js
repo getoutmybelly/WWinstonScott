@@ -37,7 +37,7 @@ export default {
 
       return html(renderMessage("Not found", "That page does not exist."), 404, headers);
     } catch (error) {
-      console.error("Unhandled request error", error);
+      console.error(JSON.stringify({ message: "unhandled request error", error: error instanceof Error ? error.message : String(error) }));
       return html(
         renderMessage("Something went wrong", "The publisher could not complete that request."),
         500,
@@ -161,7 +161,7 @@ async function finishLinkedInOAuth(request, env) {
   });
   const tokens = await tokenResponse.json();
   if (!tokenResponse.ok || !tokens.access_token) {
-    console.error("LinkedIn token exchange failed", tokenResponse.status, tokens.error);
+    console.error(JSON.stringify({ message: "LinkedIn token exchange failed", status: tokenResponse.status, error: tokens.error || null }));
     return html(renderMessage("LinkedIn did not connect", "The authorization code could not be exchanged. Try connecting again."), 502);
   }
 
@@ -170,7 +170,7 @@ async function finishLinkedInOAuth(request, env) {
   });
   const profile = await profileResponse.json();
   if (!profileResponse.ok || !profile.sub) {
-    console.error("LinkedIn userinfo failed", profileResponse.status);
+    console.error(JSON.stringify({ message: "LinkedIn userinfo failed", status: profileResponse.status }));
     return html(renderMessage("Profile unavailable", "LinkedIn connected, but the member profile could not be confirmed."), 502);
   }
 
@@ -234,9 +234,8 @@ async function publishPost(request, env) {
     },
     body: JSON.stringify(body),
   });
-  const responseText = await linkedInResponse.text();
   if (!linkedInResponse.ok) {
-    console.error("LinkedIn publish failed", linkedInResponse.status, responseText.slice(0, 500));
+    console.error(JSON.stringify({ message: "LinkedIn publish failed", status: linkedInResponse.status }));
     return html(renderMessage("LinkedIn did not publish the post", `LinkedIn returned status ${linkedInResponse.status}. No retry was attempted, so this cannot create a duplicate.`), 502);
   }
 
@@ -274,9 +273,12 @@ async function sign(value, secret) {
 
 async function safeEqual(a, b) {
   const [left, right] = await Promise.all([crypto.subtle.digest("SHA-256", new TextEncoder().encode(a)), crypto.subtle.digest("SHA-256", new TextEncoder().encode(b))]);
+  if (typeof crypto.subtle.timingSafeEqual === "function") {
+    return crypto.subtle.timingSafeEqual(left, right);
+  }
   const x = new Uint8Array(left), y = new Uint8Array(right);
-  let difference = x.length ^ y.length;
-  for (let i = 0; i < Math.min(x.length, y.length); i++) difference |= x[i] ^ y[i];
+  let difference = 0;
+  for (let index = 0; index < x.length; index++) difference |= x[index] ^ y[index];
   return difference === 0;
 }
 
