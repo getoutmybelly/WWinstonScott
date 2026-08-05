@@ -47,7 +47,10 @@ test("publisher stays locked until the admin password is supplied", async () => 
 
   const sessionCookie = await unlock(env);
   const unlocked = await worker.fetch(new Request(`${ORIGIN}/`, { headers: { Cookie: sessionCookie } }), env);
-  assert.match(await unlocked.text(), /LinkedIn is not connected/);
+  const body = await unlocked.text();
+  assert.match(body, /LinkedIn is not connected/);
+  assert.match(body, /Copy &amp; Open Personal Facebook/);
+  assert.match(body, /Facebook requires you to make the final post on a personal profile/);
 });
 
 test("same-origin login works when the browser serializes Origin as null", async () => {
