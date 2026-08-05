@@ -68,7 +68,7 @@ async function renderApp(request, env) {
     <a class="button secondary" href="/linkedin/connect">${connected ? "Reconnect" : "Connect LinkedIn"}</a>
   </section>
   <section class="card">
-    <p class="eyebrow">APPROVAL DESK</p><h2>Prepare a personal-profile post</h2>
+    <p class="eyebrow">LINKEDIN APPROVAL</p><h2>Prepare a LinkedIn post</h2>
     <p class="muted">Nothing is published until you press the final Publish button.</p>
     <form method="post" action="/api/publish" id="publisher">
       <label for="text">Post text</label>
@@ -82,8 +82,30 @@ async function renderApp(request, env) {
       <button class="button primary" type="submit" ${connected ? "" : "disabled"}>Publish to my LinkedIn</button>
     </form>
   </section>
+  <section class="card">
+    <p class="eyebrow">PERSONAL FACEBOOK</p><h2>Prepare your Facebook version</h2>
+    <p class="muted">Facebook requires you to make the final post on a personal profile. This button copies your prepared text, adds the article link if supplied above, and opens Facebook for your final review.</p>
+    <label for="facebookText">Facebook post text</label>
+    <textarea id="facebookText" maxlength="5000" placeholder="Paste the approved Facebook version here…"></textarea>
+    <div class="counter"><span id="facebookCount">0</span> / 5000</div>
+    <button class="button secondary" id="facebookShare" type="button">Copy &amp; Open Personal Facebook</button>
+    <p class="share-status" id="facebookStatus" role="status" aria-live="polite"></p>
+  </section>
   <form method="post" action="/api/logout" class="logout"><button type="submit">Lock publisher</button></form>
-</main><script>const t=document.querySelector('#text'),c=document.querySelector('#count');if(t)t.addEventListener('input',()=>c.textContent=t.value.length);</script></body></html>`;
+</main><script>
+const t=document.querySelector('#text'),c=document.querySelector('#count'),f=document.querySelector('#facebookText'),fc=document.querySelector('#facebookCount'),fb=document.querySelector('#facebookShare'),fs=document.querySelector('#facebookStatus'),article=document.querySelector('#articleUrl');
+if(t)t.addEventListener('input',()=>c.textContent=t.value.length);
+if(f)f.addEventListener('input',()=>fc.textContent=f.value.length);
+if(fb)fb.addEventListener('click',async()=>{
+  const post=f.value.trim();
+  if(!post){fs.textContent='Add your approved Facebook text first.';f.focus();return;}
+  const link=article.value.trim();
+  const shareText=[post,link].filter(Boolean).join('\n\n');
+  window.open('https://www.facebook.com/','_blank','noopener,noreferrer');
+  try{await navigator.clipboard.writeText(shareText);fs.textContent='Copied. Paste into the Facebook composer, review it, and press Post when ready.';}
+  catch{fs.textContent='Facebook opened, but your browser blocked copying. Select and copy the Facebook text manually.';}
+});
+</script></body></html>`;
 }
 
 function loginPage(message = "") {
@@ -352,5 +374,5 @@ function renderMessage(title, message, returnTo = "/") {
 function escapeHtml(value) { return String(value).replace(/[&<>"']/g, (character) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;" })[character]); }
 
 function styles() {
-  return `<style>:root{--ink:#13273a;--paper:#f4efe5;--card:#fffdf7;--gold:#b18442;--line:#d8cdbb;--muted:#68727b}*{box-sizing:border-box}body{margin:0;background:linear-gradient(135deg,#ede4d5,#f7f4ec);color:var(--ink);font:16px/1.55 Georgia,serif;min-height:100vh}.shell{width:min(900px,92vw);margin:48px auto}.narrow{width:min(560px,92vw)}header{display:flex;align-items:center;gap:16px;margin-bottom:24px}.mark{display:grid;place-items:center;width:62px;height:62px;background:var(--ink);border:3px solid var(--gold);border-radius:14px;color:#fff;font:700 27px Georgia}h1,h2,p{margin-top:0}h1{margin-bottom:0;font-size:clamp(1.8rem,4vw,2.7rem)}h2{font-size:1.45rem}.eyebrow{font:700 .74rem/1.2 Arial,sans-serif;letter-spacing:.18em;color:var(--gold);margin-bottom:6px}.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:clamp(22px,4vw,38px);box-shadow:0 14px 40px #2d24151a;margin-bottom:22px}.status-card{display:flex;align-items:center;justify-content:space-between;gap:25px}.muted,.counter,label span{color:var(--muted)}label{display:block;font-weight:700;margin:20px 0 8px}textarea,input,select{width:100%;border:1px solid #aeb6ba;border-radius:10px;padding:13px;background:#fff;font:inherit;color:var(--ink)}textarea{min-height:250px;resize:vertical}.counter{text-align:right;font:13px Arial,sans-serif;margin-top:5px}.confirm{display:flex;align-items:flex-start;gap:10px;font-weight:400;background:#f2eadb;padding:14px;border-radius:10px}.confirm input{width:auto;margin-top:5px}.button{display:inline-block;border:0;border-radius:10px;padding:12px 18px;font:700 15px Arial,sans-serif;text-decoration:none;cursor:pointer}.primary{background:var(--ink);color:#fff;margin-top:18px}.secondary{border:1px solid var(--ink);color:var(--ink);background:transparent;white-space:nowrap}.button:disabled{opacity:.45;cursor:not-allowed}.logout{text-align:center}.logout button{border:0;background:transparent;color:var(--muted);text-decoration:underline;cursor:pointer}.error{color:#9d2f2f;font-weight:700}@media(max-width:650px){.shell{margin:26px auto}.status-card{align-items:flex-start;flex-direction:column}}</style>`;
+  return `<style>:root{--ink:#13273a;--paper:#f4efe5;--card:#fffdf7;--gold:#b18442;--line:#d8cdbb;--muted:#68727b}*{box-sizing:border-box}body{margin:0;background:linear-gradient(135deg,#ede4d5,#f7f4ec);color:var(--ink);font:16px/1.55 Georgia,serif;min-height:100vh}.shell{width:min(900px,92vw);margin:48px auto}.narrow{width:min(560px,92vw)}header{display:flex;align-items:center;gap:16px;margin-bottom:24px}.mark{display:grid;place-items:center;width:62px;height:62px;background:var(--ink);border:3px solid var(--gold);border-radius:14px;color:#fff;font:700 27px Georgia}h1,h2,p{margin-top:0}h1{margin-bottom:0;font-size:clamp(1.8rem,4vw,2.7rem)}h2{font-size:1.45rem}.eyebrow{font:700 .74rem/1.2 Arial,sans-serif;letter-spacing:.18em;color:var(--gold);margin-bottom:6px}.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:clamp(22px,4vw,38px);box-shadow:0 14px 40px #2d24151a;margin-bottom:22px}.status-card{display:flex;align-items:center;justify-content:space-between;gap:25px}.muted,.counter,label span{color:var(--muted)}label{display:block;font-weight:700;margin:20px 0 8px}textarea,input,select{width:100%;border:1px solid #aeb6ba;border-radius:10px;padding:13px;background:#fff;font:inherit;color:var(--ink)}textarea{min-height:250px;resize:vertical}.counter{text-align:right;font:13px Arial,sans-serif;margin-top:5px}.confirm{display:flex;align-items:flex-start;gap:10px;font-weight:400;background:#f2eadb;padding:14px;border-radius:10px}.confirm input{width:auto;margin-top:5px}.button{display:inline-block;border:0;border-radius:10px;padding:12px 18px;font:700 15px Arial,sans-serif;text-decoration:none;cursor:pointer}.primary{background:var(--ink);color:#fff;margin-top:18px}.secondary{border:1px solid var(--ink);color:var(--ink);background:transparent;white-space:nowrap}.button:disabled{opacity:.45;cursor:not-allowed}.share-status{min-height:1.5em;margin:12px 0 0;color:var(--muted);font-weight:700}.logout{text-align:center}.logout button{border:0;background:transparent;color:var(--muted);text-decoration:underline;cursor:pointer}.error{color:#9d2f2f;font-weight:700}@media(max-width:650px){.shell{margin:26px auto}.status-card{align-items:flex-start;flex-direction:column}}</style>`;
 }
