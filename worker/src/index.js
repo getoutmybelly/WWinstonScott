@@ -2,10 +2,13 @@ const LINKEDIN_AUTHORIZE_URL = "https://www.linkedin.com/oauth/v2/authorization"
 const LINKEDIN_TOKEN_URL = "https://www.linkedin.com/oauth/v2/accessToken";
 const LINKEDIN_USERINFO_URL = "https://api.linkedin.com/v2/userinfo";
 const LINKEDIN_POST_URL = "https://api.linkedin.com/v2/ugcPosts";
+const LINKEDIN_ASSET_URL = "https://api.linkedin.com/v2/assets?action=registerUpload";
 const CONNECTION_KEY = "linkedin:connection";
 const ADMIN_COOKIE = "__Host-wfn_admin";
 const OAUTH_COOKIE = "__Host-wfn_oauth";
 const MAX_POST_LENGTH = 3000;
+const MAX_IMAGE_BYTES = 10 * 1024 * 1024;
+const ALLOWED_IMAGE_TYPES = new Set(["image/jpeg", "image/png", "image/gif"]);
 
 export default {
   async fetch(request, env) {
@@ -70,12 +73,21 @@ async function renderApp(request, env) {
   <section class="card">
     <p class="eyebrow">LINKEDIN APPROVAL</p><h2>Prepare a LinkedIn post</h2>
     <p class="muted">Nothing is published until you press the final Publish button.</p>
-    <form method="post" action="/api/publish" id="publisher">
+    <form method="post" action="/api/publish" enctype="multipart/form-data" id="publisher">
       <label for="text">Post text</label>
       <textarea id="text" name="text" maxlength="${MAX_POST_LENGTH}" required placeholder="Write or paste the approved Field Note here…"></textarea>
       <div class="counter"><span id="count">0</span> / ${MAX_POST_LENGTH}</div>
       <label for="articleUrl">Article link <span>(optional)</span></label>
       <input id="articleUrl" name="articleUrl" type="url" placeholder="https://…">
+      <label for="image">Picture <span>(optional — JPG, PNG, or GIF; maximum 10 MB)</span></label>
+      <input id="image" name="image" type="file" accept="image/jpeg,image/png,image/gif">
+      <div class="image-preview" id="imagePreview" hidden>
+        <img id="imagePreviewPhoto" alt="Selected LinkedIn picture preview">
+        <div><strong id="imagePreviewName"></strong><button type="button" class="remove-image" id="removeImage">Remove picture</button></div>
+      </div>
+      <label for="imageAlt">Picture description <span>(optional, improves accessibility)</span></label>
+      <input id="imageAlt" name="imageAlt" maxlength="500" placeholder="Describe what is visible in the picture">
+      <p class="field-note">If you add both a picture and an article link, the picture will be attached and the link will be added to the post text.</p>
       <label for="visibility">Visibility</label>
       <select id="visibility" name="visibility"><option value="PUBLIC">Public</option><option value="CONNECTIONS">Connections only</option></select>
       <label class="confirm"><input type="checkbox" name="confirmed" value="yes" required> I reviewed this exact post and approve publishing it now.</label>
@@ -93,9 +105,13 @@ async function renderApp(request, env) {
   </section>
   <form method="post" action="/api/logout" class="logout"><button type="submit">Lock publisher</button></form>
 </main><script>
-const t=document.querySelector('#text'),c=document.querySelector('#count'),f=document.querySelector('#facebookText'),fc=document.querySelector('#facebookCount'),fb=document.querySelector('#facebookShare'),fs=document.querySelector('#facebookStatus'),article=document.querySelector('#articleUrl');
+const t=document.querySelector('#text'),c=document.querySelector('#count'),f=document.querySelector('#facebookText'),fc=document.querySelector('#facebookCount'),fb=document.querySelector('#facebookShare'),fs=document.querySelector('#facebookStatus'),article=document.querySelector('#articleUrl'),image=document.querySelector('#image'),preview=document.querySelector('#imagePreview'),previewPhoto=document.querySelector('#imagePreviewPhoto'),previewName=document.querySelector('#imagePreviewName'),removeImage=document.querySelector('#removeImage');
 if(t)t.addEventListener('input',()=>c.textContent=t.value.length);
 if(f)f.addEventListener('input',()=>fc.textContent=f.value.length);
+let previewUrl='';
+function clearImage(){if(previewUrl)URL.revokeObjectURL(previewUrl);previewUrl='';image.value='';previewPhoto.removeAttribute('src');preview.hidden=true;}
+if(image)image.addEventListener('change',()=>{const file=image.files&&image.files[0];if(!file){clearImage();return;}if(previewUrl)URL.revokeObjectURL(previewUrl);previewUrl=URL.createObjectURL(file);previewPhoto.src=previewUrl;previewName.textContent=file.name+' · '+(file.size/1024/1024).toFixed(1)+' MB';preview.hidden=false;});
+if(removeImage)removeImage.addEventListener('click',clearImage);
 if(fb)fb.addEventListener('click',async()=>{
   const post=f.value.trim();
   if(!post){fs.textContent='Add your approved Facebook text first.';f.focus();return;}
@@ -218,14 +234,21 @@ async function publishPost(request, env) {
   const form = await request.formData();
   const text = String(form.get("text") || "").trim();
   const articleUrl = String(form.get("articleUrl") || "").trim();
+  const image = form.get("image");
+  const imageAlt = String(form.get("imageAlt") || "").trim().slice(0, 500);
   const visibility = form.get("visibility") === "CONNECTIONS" ? "CONNECTIONS" : "PUBLIC";
   const confirmed = form.get("confirmed") === "yes";
+  const hasImage = isUploadedFile(image);
+  const publishedText = hasImage && articleUrl && !text.includes(articleUrl) ? `${text}\n\n${articleUrl}` : text;
 
-  if (!confirmed || !text || text.length > MAX_POST_LENGTH) {
+  if (!confirmed || !text || publishedText.length > MAX_POST_LENGTH) {
     return html(renderMessage("Post not published", "Review the post, keep it within 3,000 characters, and check the approval box."), 400);
   }
   if (articleUrl && !isHttpUrl(articleUrl)) {
     return html(renderMessage("Post not published", "The article link must begin with https:// or http://."), 400);
+  }
+  if (hasImage && (!ALLOWED_IMAGE_TYPES.has(image.type) || image.size > MAX_IMAGE_BYTES)) {
+    return html(renderMessage("Post not published", "The picture must be a JPG, PNG, or GIF file no larger than 10 MB."), 400);
   }
 
   const connection = await env.LINKEDIN_STORE.get(CONNECTION_KEY, "json");
@@ -233,14 +256,30 @@ async function publishPost(request, env) {
     return html(renderMessage("Reconnect LinkedIn", "The LinkedIn connection is missing or expired. Return to the publisher and reconnect."), 401);
   }
 
-  const media = articleUrl ? [{ status: "READY", originalUrl: articleUrl }] : undefined;
+  let media;
+  let mediaCategory = articleUrl ? "ARTICLE" : "NONE";
+  if (hasImage) {
+    const imageAsset = await uploadLinkedInImage(image, `urn:li:person:${connection.memberSub}`, connection.accessToken);
+    if (!imageAsset) {
+      return html(renderMessage("Picture was not uploaded", "LinkedIn did not accept the picture. Nothing was published; try a smaller JPG or PNG."), 502);
+    }
+    mediaCategory = "IMAGE";
+    media = [{
+      status: "READY",
+      media: imageAsset,
+      title: { text: String(image.name || "Field Notes image").slice(0, 200) },
+      description: { text: imageAlt || "Image accompanying this Winston Field Notes post." },
+    }];
+  } else if (articleUrl) {
+    media = [{ status: "READY", originalUrl: articleUrl }];
+  }
   const body = {
     author: `urn:li:person:${connection.memberSub}`,
     lifecycleState: "PUBLISHED",
     specificContent: {
       "com.linkedin.ugc.ShareContent": {
-        shareCommentary: { text },
-        shareMediaCategory: articleUrl ? "ARTICLE" : "NONE",
+        shareCommentary: { text: publishedText },
+        shareMediaCategory: mediaCategory,
         ...(media ? { media } : {}),
       },
     },
@@ -263,6 +302,45 @@ async function publishPost(request, env) {
 
   const postId = linkedInResponse.headers.get("x-restli-id") || "Published";
   return html(renderMessage("Published to LinkedIn", `LinkedIn confirmed the post. Reference: ${postId}`, "/"), 200);
+}
+
+async function uploadLinkedInImage(image, owner, accessToken) {
+  const registerResponse = await fetch(LINKEDIN_ASSET_URL, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      "Content-Type": "application/json",
+      "X-Restli-Protocol-Version": "2.0.0",
+    },
+    body: JSON.stringify({
+      registerUploadRequest: {
+        recipes: ["urn:li:digitalmediaRecipe:feedshare-image"],
+        owner,
+        serviceRelationships: [{ relationshipType: "OWNER", identifier: "urn:li:userGeneratedContent" }],
+      },
+    }),
+  });
+
+  let registration;
+  try { registration = await registerResponse.json(); } catch { registration = null; }
+  const mechanism = registration?.value?.uploadMechanism?.["com.linkedin.digitalmedia.uploading.MediaUploadHttpRequest"];
+  const uploadUrl = mechanism?.uploadUrl;
+  const asset = registration?.value?.asset;
+  if (!registerResponse.ok || !uploadUrl || !asset || !isHttpUrl(uploadUrl)) {
+    console.error(JSON.stringify({ message: "LinkedIn image registration failed", status: registerResponse.status }));
+    return null;
+  }
+
+  const uploadResponse = await fetch(uploadUrl, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${accessToken}` },
+    body: await image.arrayBuffer(),
+  });
+  if (!uploadResponse.ok) {
+    console.error(JSON.stringify({ message: "LinkedIn image upload failed", status: uploadResponse.status }));
+    return null;
+  }
+  return asset;
 }
 
 async function isAdmin(request, env) {
@@ -329,6 +407,10 @@ function isHttpUrl(value) {
   try { return ["http:", "https:"].includes(new URL(value).protocol); } catch { return false; }
 }
 
+function isUploadedFile(value) {
+  return value && typeof value === "object" && typeof value.arrayBuffer === "function" && Number(value.size) > 0;
+}
+
 function randomToken(bytes) {
   const data = new Uint8Array(bytes); crypto.getRandomValues(data); return bytesToBase64Url(data);
 }
@@ -359,7 +441,7 @@ function withHeaders(response, headers) { const output = new Response(response.b
 
 function securityHeaders() {
   return {
-    "Content-Security-Policy": "default-src 'self'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; form-action 'self'; frame-ancestors 'none'; base-uri 'none'",
+    "Content-Security-Policy": "default-src 'self'; img-src 'self' blob: data:; style-src 'unsafe-inline'; script-src 'unsafe-inline'; form-action 'self'; frame-ancestors 'none'; base-uri 'none'",
     "Referrer-Policy": "same-origin",
     "X-Content-Type-Options": "nosniff",
     "X-Frame-Options": "DENY",
@@ -374,5 +456,5 @@ function renderMessage(title, message, returnTo = "/") {
 function escapeHtml(value) { return String(value).replace(/[&<>"']/g, (character) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;" })[character]); }
 
 function styles() {
-  return `<style>:root{--ink:#13273a;--paper:#f4efe5;--card:#fffdf7;--gold:#b18442;--line:#d8cdbb;--muted:#68727b}*{box-sizing:border-box}body{margin:0;background:linear-gradient(135deg,#ede4d5,#f7f4ec);color:var(--ink);font:16px/1.55 Georgia,serif;min-height:100vh}.shell{width:min(900px,92vw);margin:48px auto}.narrow{width:min(560px,92vw)}header{display:flex;align-items:center;gap:16px;margin-bottom:24px}.mark{display:grid;place-items:center;width:62px;height:62px;background:var(--ink);border:3px solid var(--gold);border-radius:14px;color:#fff;font:700 27px Georgia}h1,h2,p{margin-top:0}h1{margin-bottom:0;font-size:clamp(1.8rem,4vw,2.7rem)}h2{font-size:1.45rem}.eyebrow{font:700 .74rem/1.2 Arial,sans-serif;letter-spacing:.18em;color:var(--gold);margin-bottom:6px}.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:clamp(22px,4vw,38px);box-shadow:0 14px 40px #2d24151a;margin-bottom:22px}.status-card{display:flex;align-items:center;justify-content:space-between;gap:25px}.muted,.counter,label span{color:var(--muted)}label{display:block;font-weight:700;margin:20px 0 8px}textarea,input,select{width:100%;border:1px solid #aeb6ba;border-radius:10px;padding:13px;background:#fff;font:inherit;color:var(--ink)}textarea{min-height:250px;resize:vertical}.counter{text-align:right;font:13px Arial,sans-serif;margin-top:5px}.confirm{display:flex;align-items:flex-start;gap:10px;font-weight:400;background:#f2eadb;padding:14px;border-radius:10px}.confirm input{width:auto;margin-top:5px}.button{display:inline-block;border:0;border-radius:10px;padding:12px 18px;font:700 15px Arial,sans-serif;text-decoration:none;cursor:pointer}.primary{background:var(--ink);color:#fff;margin-top:18px}.secondary{border:1px solid var(--ink);color:var(--ink);background:transparent;white-space:nowrap}.button:disabled{opacity:.45;cursor:not-allowed}.share-status{min-height:1.5em;margin:12px 0 0;color:var(--muted);font-weight:700}.logout{text-align:center}.logout button{border:0;background:transparent;color:var(--muted);text-decoration:underline;cursor:pointer}.error{color:#9d2f2f;font-weight:700}@media(max-width:650px){.shell{margin:26px auto}.status-card{align-items:flex-start;flex-direction:column}}</style>`;
+  return `<style>:root{--ink:#13273a;--paper:#f4efe5;--card:#fffdf7;--gold:#b18442;--line:#d8cdbb;--muted:#68727b}*{box-sizing:border-box}body{margin:0;background:linear-gradient(135deg,#ede4d5,#f7f4ec);color:var(--ink);font:16px/1.55 Georgia,serif;min-height:100vh}.shell{width:min(900px,92vw);margin:48px auto}.narrow{width:min(560px,92vw)}header{display:flex;align-items:center;gap:16px;margin-bottom:24px}.mark{display:grid;place-items:center;width:62px;height:62px;background:var(--ink);border:3px solid var(--gold);border-radius:14px;color:#fff;font:700 27px Georgia}h1,h2,p{margin-top:0}h1{margin-bottom:0;font-size:clamp(1.8rem,4vw,2.7rem)}h2{font-size:1.45rem}.eyebrow{font:700 .74rem/1.2 Arial,sans-serif;letter-spacing:.18em;color:var(--gold);margin-bottom:6px}.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:clamp(22px,4vw,38px);box-shadow:0 14px 40px #2d24151a;margin-bottom:22px}.status-card{display:flex;align-items:center;justify-content:space-between;gap:25px}.muted,.counter,label span,.field-note{color:var(--muted)}label{display:block;font-weight:700;margin:20px 0 8px}textarea,input,select{width:100%;border:1px solid #aeb6ba;border-radius:10px;padding:13px;background:#fff;font:inherit;color:var(--ink)}textarea{min-height:250px;resize:vertical}.counter{text-align:right;font:13px Arial,sans-serif;margin-top:5px}.field-note{font:13px/1.45 Arial,sans-serif;margin:8px 0 0}.image-preview{margin-top:12px;padding:12px;border:1px solid var(--line);border-radius:12px;background:#f7f1e6}.image-preview img{display:block;max-width:100%;max-height:360px;margin:0 auto 10px;border-radius:8px}.image-preview div{display:flex;align-items:center;justify-content:space-between;gap:12px;font:14px Arial,sans-serif}.remove-image{border:0;background:transparent;color:#9d2f2f;text-decoration:underline;cursor:pointer}.confirm{display:flex;align-items:flex-start;gap:10px;font-weight:400;background:#f2eadb;padding:14px;border-radius:10px}.confirm input{width:auto;margin-top:5px}.button{display:inline-block;border:0;border-radius:10px;padding:12px 18px;font:700 15px Arial,sans-serif;text-decoration:none;cursor:pointer}.primary{background:var(--ink);color:#fff;margin-top:18px}.secondary{border:1px solid var(--ink);color:var(--ink);background:transparent;white-space:nowrap}.button:disabled{opacity:.45;cursor:not-allowed}.share-status{min-height:1.5em;margin:12px 0 0;color:var(--muted);font-weight:700}.logout{text-align:center}.logout button{border:0;background:transparent;color:var(--muted);text-decoration:underline;cursor:pointer}.error{color:#9d2f2f;font-weight:700}@media(max-width:650px){.shell{margin:26px auto}.status-card{align-items:flex-start;flex-direction:column}.image-preview div{align-items:flex-start;flex-direction:column}}</style>`;
 }

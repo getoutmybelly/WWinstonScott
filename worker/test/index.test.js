@@ -52,6 +52,9 @@ test("publisher stays locked until the admin password is supplied", async () => 
   assert.match(body, /Copy &amp; Open Personal Facebook/);
   assert.match(body, /Facebook requires you to make the final post on a personal profile/);
   assert.match(body, /https:\/\/www\.facebook\.com\/WayneScottII/);
+  assert.match(body, /enctype="multipart\/form-data"/);
+  assert.match(body, /name="image" type="file"/);
+  assert.match(body, /Picture description/);
   const script = body.match(/<script>([\s\S]*?)<\/script>/)?.[1];
   assert.ok(script);
   assert.doesNotThrow(() => new Function(script));
@@ -112,6 +115,57 @@ test("a post is sent only after an authenticated, explicit approval", async () =
     assert.equal(captured.body.author, "urn:li:person:member-123");
     assert.equal(captured.body.specificContent["com.linkedin.ugc.ShareContent"].shareCommentary.text, "Approved Field Note");
     assert.equal(captured.options.headers.Authorization, "Bearer test-access-token");
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test("an approved picture is uploaded and attached to the LinkedIn post", async () => {
+  const env = environment();
+  const sessionCookie = await unlock(env);
+  env.values.set("linkedin:connection", JSON.stringify({
+    accessToken: "test-access-token",
+    memberSub: "member-123",
+    memberName: "W. Winston Scott",
+    expiresAt: Date.now() + 60_000,
+  }));
+
+  const calls = [];
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async (url, options) => {
+    calls.push({ url: String(url), options });
+    if (String(url).includes("/v2/assets?action=registerUpload")) {
+      return Response.json({ value: {
+        uploadMechanism: { "com.linkedin.digitalmedia.uploading.MediaUploadHttpRequest": { uploadUrl: "https://api.linkedin.com/mediaUpload/test" } },
+        asset: "urn:li:digitalmediaAsset:image-123",
+      } });
+    }
+    if (String(url).includes("/mediaUpload/test")) return new Response("", { status: 201 });
+    return new Response("", { status: 201, headers: { "x-restli-id": "urn:li:share:456" } });
+  };
+
+  try {
+    const form = new FormData();
+    form.set("text", "Approved Field Note");
+    form.set("articleUrl", "https://example.com/source");
+    form.set("visibility", "PUBLIC");
+    form.set("confirmed", "yes");
+    form.set("imageAlt", "Winston speaking at a community meeting");
+    form.set("image", new File([new Uint8Array([1, 2, 3])], "field-note.jpg", { type: "image/jpeg" }));
+    const response = await worker.fetch(new Request(`${ORIGIN}/api/publish`, {
+      method: "POST",
+      headers: { Cookie: sessionCookie, Origin: ORIGIN },
+      body: form,
+    }), env);
+
+    assert.equal(response.status, 200);
+    assert.equal(calls.length, 3);
+    const postBody = JSON.parse(calls[2].options.body);
+    const content = postBody.specificContent["com.linkedin.ugc.ShareContent"];
+    assert.equal(content.shareMediaCategory, "IMAGE");
+    assert.equal(content.media[0].media, "urn:li:digitalmediaAsset:image-123");
+    assert.equal(content.media[0].description.text, "Winston speaking at a community meeting");
+    assert.equal(content.shareCommentary.text, "Approved Field Note\n\nhttps://example.com/source");
   } finally {
     globalThis.fetch = originalFetch;
   }
