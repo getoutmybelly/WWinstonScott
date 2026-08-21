@@ -134,16 +134,41 @@ async function draftWithAI(request, env) {
   const prompt = `Create two social-media drafts for Winston Field Notes, an independent professional voice. Return ONLY valid JSON with exactly these keys: linkedin (string), facebook (string), hashtags (array of 3 to 6 strings beginning with #).\n\nLinkedIn: thoughtful, specific, credible, conversational, under 2200 characters, no invented facts, no fake quotations, no engagement bait.\nFacebook: warmer and more personal, under 1800 characters, no invented facts.\nHashtags: relevant and restrained. Do not include the article URL in either draft; the app handles it separately. If context is insufficient, frame the post as a reflection rather than asserting details.\n\nSOURCE OR DIRECTION:\n${notes || "(none)"}\n\nARTICLE URL:\n${articleUrl || "(none)"}\n\nIMAGE DESCRIPTION:\n${imageAlt || "(none)"}`;
   let result;
   try {
-    result = await env.AI.run("@cf/openai/gpt-oss-20b", { messages: [{ role: "system", content: "You are a careful editorial assistant. Follow the requested JSON contract exactly." }, { role: "user", content: prompt }], max_tokens: 900, temperature: 0.6 });
+    result = await env.AI.run("@cf/meta/llama-3.3-70b-instruct-fp8-fast", {
+      messages: [{ role: "system", content: "You are a careful editorial assistant. Follow the requested JSON contract exactly." }, { role: "user", content: prompt }],
+      max_tokens: 1000,
+      temperature: 0.5,
+      response_format: {
+        type: "json_schema",
+        json_schema: {
+          type: "object",
+          properties: {
+            linkedin: { type: "string" },
+            facebook: { type: "string" },
+            hashtags: { type: "array", items: { type: "string" }, minItems: 3, maxItems: 6 }
+          },
+          required: ["linkedin", "facebook", "hashtags"],
+          additionalProperties: false
+        }
+      }
+    });
   } catch (error) {
     console.error(JSON.stringify({ message: "AI draft failed", error: error instanceof Error ? error.message : String(error) }));
     return json({ error: "AI could not create a draft right now. Try again in a moment." }, 502);
   }
-  const raw = typeof result === "string" ? result : String(result?.response || result?.result?.response || "");
   let draft;
-  try { draft = JSON.parse(raw.replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/, "")); } catch {
-    console.error(JSON.stringify({ message: "AI returned invalid draft JSON" }));
-    return json({ error: "AI returned an incomplete draft. Please try again." }, 502);
+  const payload = result?.response ?? result?.result?.response ?? result;
+  if (payload && typeof payload === "object" && !Array.isArray(payload)) {
+    draft = payload;
+  } else {
+    const raw = String(payload || "").replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/, "").trim();
+    try { draft = JSON.parse(raw); } catch {
+      const start = raw.indexOf("{");
+      const end = raw.lastIndexOf("}");
+      if (start >= 0 && end > start) {
+        try { draft = JSON.parse(raw.slice(start, end + 1)); } catch {}
+      }
+    }
   }
   const linkedin = String(draft?.linkedin || "").trim().slice(0, 2600);
   const facebook = String(draft?.facebook || "").trim().slice(0, 4000);
