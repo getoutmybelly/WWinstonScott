@@ -217,7 +217,7 @@ test("authenticated AI drafting returns separate platform drafts without publish
     facebook: "A warmer personal reflection.",
     hashtags: ["#Leadership", "#Community", "#FieldNotes"],
   });
-  assert.equal(modelCall.model, "@cf/openai/gpt-oss-20b");
+  assert.equal(modelCall.model, "@cf/meta/llama-3.3-70b-instruct-fp8-fast");\n  assert.equal(modelCall.options.response_format.type, "json_schema");
   assert.match(modelCall.options.messages[1].content, /showing up for the community/);
 });
 
