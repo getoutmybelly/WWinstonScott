@@ -1,22 +1,16 @@
 {
-  "$schema": "./node_modules/wrangler/config-schema.json",
+  "$schema": "node_modules/wrangler/config-schema.json",
   "name": "winston-field-notes-publisher",
   "main": "src/index.js",
-  "compatibility_date": "2026-08-06",
+  "compatibility_date": "2026-08-21",
   "compatibility_flags": ["nodejs_compat"],
   "workers_dev": true,
   "vars": {
     "LINKEDIN_REDIRECT_URI": "https://winston-field-notes-publisher.michelle-cb4.workers.dev/linkedin/callback"
   },
-  "kv_namespaces": [
-    {
-      "binding": "LINKEDIN_STORE"
-    }
-  ],
+  "kv_namespaces": [{ "binding": "LINKEDIN_STORE", "id": "c014bc9a292e4068b1b7ab5d60547db8" }],
   "observability": {
     "enabled": true,
-    "logs": {
-      "head_sampling_rate": 1
-    }
+    "logs": { "head_sampling_rate": 1 }
   }
 }
