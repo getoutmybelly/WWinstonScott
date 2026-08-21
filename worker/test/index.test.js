@@ -43,18 +43,18 @@ test("health endpoint and security headers are available", async () => {
 test("publisher stays locked until the admin password is supplied", async () => {
   const env = environment();
   const locked = await worker.fetch(new Request(`${ORIGIN}/`), env);
-  assert.match(await locked.text(), /Unlock the approval desk/);
+  assert.match(await locked.text(), /Welcome back/);
 
   const sessionCookie = await unlock(env);
   const unlocked = await worker.fetch(new Request(`${ORIGIN}/`, { headers: { Cookie: sessionCookie } }), env);
   const body = await unlocked.text();
   assert.match(body, /LinkedIn is not connected/);
-  assert.match(body, /Copy &amp; Open Personal Facebook/);
-  assert.match(body, /Facebook requires you to make the final post on a personal profile/);
-  assert.match(body, /https:\/\/www\.facebook\.com\/WayneScottII/);
+  assert.match(body, /Share or copy for Facebook/);
+  assert.match(body, /You always make the final post inside Facebook/);
+  assert.match(body, /https:\/\/www\.facebook\.com\//);
   assert.match(body, /enctype="multipart\/form-data"/);
   assert.match(body, /name="image" type="file"/);
-  assert.match(body, /Picture description/);
+  assert.match(body, /Image description/);\n  assert.match(body, /Draft with AI/);\n  assert.match(body, /Source and direction for AI/);
   const script = body.match(/<script>([\s\S]*?)<\/script>/)?.[1];
   assert.ok(script);
   assert.doesNotThrow(() => new Function(script));
@@ -169,4 +169,65 @@ test("an approved picture is uploaded and attached to the LinkedIn post", async 
   } finally {
     globalThis.fetch = originalFetch;
   }
+});
+
+
+test("manifest exposes the installable Android share target", async () => {
+  const response = await worker.fetch(new Request(`${ORIGIN}/manifest.webmanifest`), environment());
+  assert.equal(response.status, 200);
+  const manifest = await response.json();
+  assert.equal(manifest.display, "standalone");
+  assert.equal(manifest.share_target.action, "/share-target");
+  assert.equal(manifest.share_target.method, "POST");
+  assert.equal(manifest.share_target.enctype, "multipart/form-data");
+  assert.deepEqual(manifest.share_target.params.files[0].accept, ["image/jpeg", "image/png", "image/gif"]);
+});
+
+test("share target rejects unsupported image formats", async () => {
+  const form = new FormData();
+  form.set("text", "Shared Field Note");
+  form.set("image", new File(["bad"], "picture.webp", { type: "image/webp" }));
+  const response = await worker.fetch(new Request(`${ORIGIN}/share-target`, { method: "POST", body: form }), environment());
+  assert.equal(response.status, 400);
+});
+
+
+test("authenticated AI drafting returns separate platform drafts without publishing", async () => {
+  const env = environment();
+  const sessionCookie = await unlock(env);
+  let modelCall;
+  env.AI = {
+    async run(model, options) {
+      modelCall = { model, options };
+      return { response: JSON.stringify({
+        linkedin: "A thoughtful professional reflection.",
+        facebook: "A warmer personal reflection.",
+        hashtags: ["#Leadership", "#Community", "#FieldNotes"],
+      }) };
+    },
+  };
+  const response = await worker.fetch(new Request(`${ORIGIN}/api/draft`, {
+    method: "POST",
+    headers: { Cookie: sessionCookie, Origin: ORIGIN, "Content-Type": "application/json" },
+    body: JSON.stringify({ notes: "Write about showing up for the community.", articleUrl: "https://example.com/story" }),
+  }), env);
+  assert.equal(response.status, 200);
+  assert.deepEqual(await response.json(), {
+    linkedin: "A thoughtful professional reflection.",
+    facebook: "A warmer personal reflection.",
+    hashtags: ["#Leadership", "#Community", "#FieldNotes"],
+  });
+  assert.equal(modelCall.model, "@cf/meta/llama-3.3-70b-instruct-fp8-fast");\n  assert.equal(modelCall.options.response_format.type, "json_schema");
+  assert.match(modelCall.options.messages[1].content, /showing up for the community/);
+});
+
+test("AI drafting remains locked behind the Publisher session", async () => {
+  const env = environment();
+  env.AI = { async run() { throw new Error("must not run"); } };
+  const response = await worker.fetch(new Request(`${ORIGIN}/api/draft`, {
+    method: "POST",
+    headers: { Origin: ORIGIN, "Content-Type": "application/json" },
+    body: JSON.stringify({ notes: "private notes" }),
+  }), env);
+  assert.equal(response.status, 401);
 });
