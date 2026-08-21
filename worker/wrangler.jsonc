@@ -6,6 +6,7 @@
   "compatibility_flags": ["nodejs_compat"],
   "workers_dev": true,
   "preview_urls": true,
+  "ai": { "binding": "AI" },
   "vars": {
     "LINKEDIN_REDIRECT_URI": "https://winston-field-notes-publisher.michelle-cb4.workers.dev/linkedin/callback"
   },
