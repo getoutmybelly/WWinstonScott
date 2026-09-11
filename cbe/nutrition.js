@@ -36,7 +36,7 @@ window.CBE_NUTRITION={
 "Parsley":{power:0,n:["Vitamin K","Vitamin C","Vitamin A","Folate"],v:4,m:0,macro:[],why:"Very nutrient-dense by weight, although typical serving sizes are small."},
 "Basil":{power:0,n:["Vitamin K","Vitamin A","Manganese"],v:2,m:1,macro:[],why:"A micronutrient-rich herb, though ordinary serving sizes are small."},
 "Artichoke":{power:0,n:["Fiber","Folate","Magnesium","Potassium","Vitamin C"],v:2,m:2,macro:["Fiber"],why:"Particularly useful for fiber, with folate and minerals."},
-"Mushroom":{power:0,n:["Riboflavin","Niacin","Copper","Selenium","Potassium"],v:2,m:3,macro:[],why:"Mushrooms provide several B vitamins and minerals. Vitamin D varies substantially with species and UV exposure."}
+"Mushroom":{power:1,n:["Riboflavin","Niacin","Copper","Selenium","Potassium","Ergothioneine","Vitamin D (variable)"],v:3,m:3,macro:[],why:"Edible mushrooms can provide B vitamins, copper, potassium, selenium and ergothioneine. Vitamin D varies widely by species and UV exposure, so mushrooms should not be assumed to supply enough vitamin D on their own."}
 };
 window.CBE_NUTRIENT_LIST=["Protein","Fiber","Omega-3 ALA","Vitamin A","Vitamin C","Vitamin E","Vitamin K","Folate","Iron","Calcium","Magnesium","Potassium","Zinc","Selenium"];
 window.CBE_NUTRITION_META={
