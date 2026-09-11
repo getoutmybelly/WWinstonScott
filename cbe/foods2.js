@@ -1,4 +1,9 @@
 window.CBE_FOODS=(window.CBE_FOODS||[]).concat([
+['Brown rice','🍚','annual','Annual fit','Whole grain rice','Brown rice is mature rice seed with bran and germ retained; it fits the annual-completion rule when harvested at maturity and seed continuation is preserved.','Oryza sativa'],
+['Jasmine rice','🍚','annual','Annual fit','Aromatic rice','Jasmine rice is a mature annual grain; harvesting occurs after reproductive maturity and viable seed can be retained for continuation.','Oryza sativa'],
+['Basmati rice','🍚','annual','Annual fit','Aromatic rice','Basmati is mature seed from an annual rice plant and fits the completed-cycle/seed-continuation rule.','Oryza sativa'],
+['Black rice','🖤','annual','Annual fit','Pigmented rice','Black rice is a pigmented mature rice grain; the annual crop completes reproduction before grain harvest.','Oryza sativa'],
+['Wild rice','🌾','annual','Annual fit','Aquatic grain','Wild rice is not the same species as Asian rice; it is the mature seed of aquatic grasses in the genus Zizania and fits the annual mature-seed continuation rule.','Zizania spp.'],
 ['Barley','🌾','annual','Annual fit','Grain','Fits the annual-completion rule when harvested at maturity and continuation is preserved.','Hordeum vulgare'],
 ['Rye','🌾','annual','Annual fit','Grain','Can fit after natural maturation with some grain saved as seed.','Secale cereale'],
 ['Corn','🌽','annual','Annual fit','Grain/fruit','Dry mature corn can fit the annual-completion rule; sweet corn picked young is more method-dependent.','Zea mays'],
