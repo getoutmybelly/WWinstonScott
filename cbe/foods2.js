@@ -63,5 +63,16 @@ window.CBE_FOODS=(window.CBE_FOODS||[]).concat([
 ['Taro','🌿','outside','Usually outside','Corm','Harvesting the main corm usually ends that individual, though offsets can be replanted.','Colocasia esculenta'],
 ['Cabbage','🥬','outside','Usually outside','Whole-head crop','Normal harvest cuts the entire head and growing point, ending the main individual.','Brassica oleracea var. capitata'],
 ['Leek','🌱','outside','Usually outside','Whole-plant allium','Normal harvest pulls the whole plant to eat the elongated stem and leaf bases.','Allium ampeloprasum var. porrum'],
-['Celery heart','🌿','outside','Usually outside','Whole-plant harvest','Harvesting the heart removes the central growing point. Outer stalk harvest can be more continuance-preserving.','Apium graveolens']
+['Celery heart','🌿','outside','Usually outside','Whole-plant harvest','Harvesting the heart removes the central growing point. Outer stalk harvest can be more continuance-preserving.','Apium graveolens'],
+['Nasturtium','🌺','strong','Strong fit','Edible flower','Flowers can be picked repeatedly while the living annual continues growing and blooming. Leaves and immature seed pods are also edible.','Tropaeolum majus'],
+['Calendula','🌼','strong','Strong fit','Edible flower','Petals can be harvested from flowers while the plant remains alive and continues producing blooms.','Calendula officinalis'],
+['Pansy / Viola','🌸','strong','Strong fit','Edible flower','Flowers can be harvested without killing the plant; only correctly identified edible Viola types should be eaten.','Viola spp.'],
+['Rose petals','🌹','strong','Strong fit','Edible flower','Petals can be removed from pesticide-free edible roses while the perennial shrub remains alive.','Rosa spp.'],
+['Borage flowers','💠','strong','Strong fit','Edible flower','Individual flowers can be picked while the annual plant continues growing and flowering.','Borago officinalis'],
+['Lavender flowers','💜','strong','Strong fit','Edible flower / herb','Flower spikes can be selectively harvested while the perennial plant remains alive. Use culinary lavender grown for food.','Lavandula angustifolia'],
+['Chamomile flowers','🌼','strong','Strong fit','Edible flower / herb','Flower heads can be harvested repeatedly while the plant continues producing blooms.','Matricaria chamomilla'],
+['Chive blossoms','🟣','strong','Strong fit','Edible flower / herb','Flower heads can be harvested from the perennial clump without ending the plant.','Allium schoenoprasum'],
+['Basil flowers','🌿','strong','Strong fit','Edible flower / herb','Flowering tips can be pinched and eaten while the basil plant continues branching.','Ocimum basilicum'],
+['Dill flowers','🌿','strong','Strong fit','Edible flower / herb','Flower umbels can be selectively harvested while some are left to mature seed for continuation.','Anethum graveolens'],
+['Squash blossoms','🌼','strong','Strong fit','Edible flower','Blossoms can be harvested while the squash vine remains alive. Harvesting male blossoms while leaving enough for pollination best preserves continuation.','Cucurbita spp.']
 ]);
