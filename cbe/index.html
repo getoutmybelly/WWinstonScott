@@ -39,6 +39,8 @@ dialog{border:0;border-radius:22px;padding:0;width:min(560px,calc(100% - 28px));
 <button class="chip" onclick="jumpRecipe('winter')">❄️ Winter</button>
 <button class="chip" onclick="jumpRecipe('flowers')">🌸 Flowers</button>
 <button class="chip" onclick="jumpRecipe('eggs')">🥚 Eggs</button>
+<button class="chip" onclick="jumpRecipe('brunch')">🥞 Breakfast & Brunch</button>
+<button class="chip" onclick="jumpRecipe('fruit')">🍓 Fruit Salads</button>
 <button class="chip" onclick="jumpRecipe('rice')">🍚 Rice Kitchen</button>
 <button class="chip" onclick="jumpRecipe('everyday')">🌿 Everyday</button>
 </div>
@@ -79,7 +81,7 @@ dialog{border:0;border-radius:22px;padding:0;width:min(560px,calc(100% - 28px));
 <nav><button class="nav active" data-tab="principleTab"><span>🌿</span>Principle</button><button class="nav" data-tab="searchTab"><span>🔎</span>Search</button><button class="nav" data-tab="nutritionTab"><span>🫀</span>Support</button><button class="nav" data-tab="outTab"><span>🍴</span>Out</button><button class="nav" data-tab="recipesTab"><span>🥗</span>Recipes</button><button class="nav" data-tab="seedsTab"><span>🌰</span>Seeds</button></nav>
 <dialog id="dlg"><div class="modal" id="modal"></div></dialog>
 </div>
-<script src="foods1.js?v=20260910l"></script><script src="foods2.js?v=20260910l"></script><script src="recipes.js?v=20260910l"></script><script src="nutrition.js?v=20260910l"></script><script src="restaurants.js?v=20260910l"></script><script src="processed.js?v=20260910l"></script>
+<script src="foods1.js?v=20260910l"></script><script src="foods2.js?v=20260910l"></script><script src="recipes.js?v=20260912a"></script><script src="nutrition.js?v=20260910l"></script><script src="restaurants.js?v=20260910l"></script><script src="processed.js?v=20260910l"></script>
 <script>
 var N=window.CBE_NUTRITION||{},foods=(window.CBE_FOODS||[]).map(function(x,i){return{id:i,name:x[0],emoji:x[1],kind:x[2],status:x[3],group:x[4],reason:x[5],latin:x[6],nutrition:N[x[0]]||null}}),recipes=window.CBE_RECIPES||[],active='all';
 var defs=[['all','All'],['power','🌟 Power Foods'],['flower','🌸 Edible Flowers'],['strong','Strong fits'],['annual','Annuals & seeds'],['conditional','Method-dependent'],['outside','Usually outside']],F=document.getElementById('filters'),Q=document.getElementById('q'),G=document.getElementById('foods'),C=document.getElementById('count');
@@ -120,10 +122,12 @@ holidays:['🎄 Winter Gatherings','Festive mains, sides, and breakfasts for win
 winter:['❄️ Winter Comfort','Soups, stews, and warming meals for cold-weather CBE eating.'],
 flowers:['🌸 Edible Flower Kitchen','Recipes where correctly identified, food-grown, pesticide-free edible flowers contribute flavor, aroma, texture, or color — not just decoration.'],
 eggs:['🥚 CBE Egg Kitchen','Recipes using unfertilized eggs from birds kept in conditions that meet CBE continuance and welfare principles. Chicken, duck, goose, or quail eggs follow the same rule; species preference is personal.'],
+brunch:['🥞 Breakfast & Brunch','Comforting CBE breakfasts and brunch dishes — quiche, pancakes, biscuits & mushroom gravy, and savory breakfast sandwiches — built around annual grains, continuance-compatible eggs, fruiting plants, herbs, and fungi.'],
+fruit:['🍓 Fruit Salad Bar','Fresh, colorful combinations built mostly from strong-fit fruits harvested while their trees, vines, shrubs, or perennial plants continue living.'],
 rice:['🍚 CBE Rice Kitchen','Creative recipes built around brown, jasmine, basmati, wild, and black rice. Wild rice is botanically different from Asian rice, but both fit CBE as mature grain from completed annual reproductive cycles.'],
 everyday:['🌿 Everyday CBE','Reliable meals that work any time of year.']
 };
-['fall','thanksgiving','holidays','winter','flowers','eggs','rice','everyday'].forEach(function(key){var a=recipes.filter(function(r){return r.season==key});if(!a.length)return;var s=document.createElement('section');s.className='seasonblock';s.id='recipe-'+key;s.innerHTML='<div class="seasonhead"><h2>'+seasonMeta[key][0]+'</h2><span>'+a.length+' recipe'+(a.length==1?'':'s')+'</span></div><p class="seasonintro">'+seasonMeta[key][1]+'</p><div class="seasonrecipes"></div>';var g=s.querySelector('.seasonrecipes');a.forEach(function(r){var d=document.createElement('article');d.className='recipe';d.innerHTML=recipeHTML(r);g.appendChild(d)});R.appendChild(s)});
+['fall','thanksgiving','holidays','winter','flowers','eggs','brunch','fruit','rice','everyday'].forEach(function(key){var a=recipes.filter(function(r){return r.season==key});if(!a.length)return;var s=document.createElement('section');s.className='seasonblock';s.id='recipe-'+key;s.innerHTML='<div class="seasonhead"><h2>'+seasonMeta[key][0]+'</h2><span>'+a.length+' recipe'+(a.length==1?'':'s')+'</span></div><p class="seasonintro">'+seasonMeta[key][1]+'</p><div class="seasonrecipes"></div>';var g=s.querySelector('.seasonrecipes');a.forEach(function(r){var d=document.createElement('article');d.className='recipe';d.innerHTML=recipeHTML(r);g.appendChild(d)});R.appendChild(s)});
 function jumpRecipe(key){activateTab('recipesTab');setTimeout(function(){var el=document.getElementById('recipe-'+key);if(el)el.scrollIntoView({behavior:'smooth',block:'start'})},80)}
 var PROD=window.CBE_PROCESSED||[],prodActive='all',PQ=document.getElementById('productQ'),PG=document.getElementById('products'),PC=document.getElementById('productCount'),PF=document.getElementById('productFilters');
 [['all','All products'],['Drink','Drinks'],['Cereal','Cereal'],['Pantry','Pantry'],['Snack','Snacks'],['Condiment','Condiments']].forEach(function(d){var b=document.createElement('button');b.className='chip'+(d[0]=='all'?' active':'');b.textContent=d[1];b.onclick=function(){prodActive=d[0];PF.querySelectorAll('.chip').forEach(function(x){x.classList.remove('active')});b.classList.add('active');renderProducts()};PF.appendChild(b)});
