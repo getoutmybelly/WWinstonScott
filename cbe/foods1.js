@@ -61,7 +61,7 @@ window.CBE_FOODS=(window.CBE_FOODS||[]).concat([
 ['Lemon balm','🌿','strong','Strong fit','Herb','Leaves can be cut while the perennial plant regrows.','Melissa officinalis'],
 ['Maple syrup','🍁','strong','Strong fit','Tree sap','Proper tapping removes only a small portion of sap and the tree remains alive.','Acer spp.'],
 ['Mushroom','🍄','strong','Strong fit','Fungal fruiting body','Harvesting a mushroom generally removes a fruiting body while the larger mycelial organism remains in the substrate.','Fungi'],
-['Wheat','🌾','annual','Annual fit','Grain','Fits when grain is gathered after the annual has completed its life cycle and viable seed is retained for continuation.','Triticum aestivum'],
-['Rice','🍚','annual','Annual fit','Grain','Can fit when harvested at natural crop maturity and some viable grain is retained as seed.','Oryza sativa'],
-['Oats','🌾','annual','Annual fit','Grain','The annual crop can be harvested at maturity with seed reserved for future planting.','Avena sativa'],
+['Wheat','🌾','annual','Completed-cycle / seed fit','Grain','Fits when grain is gathered after the annual has completed its life cycle and viable seed is retained for continuation.','Triticum aestivum'],
+['Rice','🍚','annual','Completed-cycle / seed fit','Grain','Can fit when harvested at natural crop maturity and some viable grain is retained as seed.','Oryza sativa'],
+['Oats','🌾','annual','Completed-cycle / seed fit','Grain','The annual crop can be harvested at maturity with seed reserved for future planting.','Avena sativa'],
 ]);
