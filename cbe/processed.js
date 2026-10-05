@@ -69,3 +69,58 @@ reviewed:"2026-09-10",
 rule:"Processed does not automatically mean non-CBE. The app evaluates each ingredient, then lowers confidence when sourcing is proprietary or ambiguous.",
 nutritionRule:"CBE compatibility and nutrition quality are separate judgments."
 };
+
+/* Lightweight public visitor counter for the static CBE site.
+   Counts a browser once (unless local storage is cleared) and displays the
+   running total. The counter begins in October 2026. */
+(function(){
+  var COUNTER_KEY='cbe-continuance-based-eating-visitors-2026-10-04-a91f6d2c';
+  var SEEN_KEY='cbeVisitorCounted_v1';
+  var BASE='https://countapi.mileshilliard.com/api/v1';
+
+  function addCounter(){
+    if(document.getElementById('cbeVisitorCounter')) return;
+    var nav=document.querySelector('nav');
+    var el=document.createElement('div');
+    el.id='cbeVisitorCounter';
+    el.setAttribute('aria-live','polite');
+    el.style.cssText='margin:28px 20px 18px;text-align:center;color:#61756e;font-size:12px;line-height:1.4';
+    el.innerHTML='<span style="display:inline-flex;align-items:center;gap:7px;background:#fff;border:1px solid #dce8e0;border-radius:999px;padding:8px 12px;box-shadow:0 5px 18px #234b3920"><span aria-hidden="true">🌿</span><span><b id="cbeVisitorCount" style="color:#1c6a49">…</b> visitors since Oct. 2026</span></span>';
+    if(nav && nav.parentNode) nav.parentNode.insertBefore(el,nav);
+    else document.body.appendChild(el);
+    return el;
+  }
+
+  function showCount(value){
+    var n=document.getElementById('cbeVisitorCount');
+    if(n && value!==undefined && value!==null) n.textContent=Number(value).toLocaleString();
+  }
+
+  function hideCounter(){
+    var el=document.getElementById('cbeVisitorCounter');
+    if(el) el.style.display='none';
+  }
+
+  function loadCounter(){
+    addCounter();
+    var seen=false;
+    try{seen=localStorage.getItem(SEEN_KEY)==='1'}catch(e){}
+    var endpoint=seen?'get':'hit';
+    fetch(BASE+'/'+endpoint+'/'+encodeURIComponent(COUNTER_KEY),{cache:'no-store'})
+      .then(function(res){
+        if(!res.ok && seen && res.status===404){
+          return fetch(BASE+'/hit/'+encodeURIComponent(COUNTER_KEY),{cache:'no-store'}).then(function(r){return r.json()});
+        }
+        if(!res.ok) throw new Error('counter unavailable');
+        return res.json();
+      })
+      .then(function(data){
+        showCount(data.value);
+        if(!seen){try{localStorage.setItem(SEEN_KEY,'1')}catch(e){}}
+      })
+      .catch(hideCounter);
+  }
+
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',loadCounter);
+  else loadCounter();
+})();
