@@ -1,0 +1,100 @@
+name: One-time CBE BF filter patch
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Patch BF recipe filtering and search
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+
+          p = Path('cbe/processed.js')
+          s = p.read_text()
+          marker = '/* CBE-first Bariatric Friendly layer. BF is a secondary recipe tag, never a substitute for CBE compatibility. */'
+          if marker not in s:
+              raise SystemExit('BF marker not found')
+          head, old = s.split(marker, 1)
+          m = re.search(r"var BADGE='([^']+)';", old)
+          if not m:
+              raise SystemExit('Existing BF badge not found')
+          badge = m.group(1)
+
+          new_bf = r'''/* CBE-first Bariatric Friendly layer. BF is a secondary recipe tag, never a substitute for CBE compatibility. */
+          (function(){
+            var BADGE='__BADGE__';
+            var recipes=window.CBE_RECIPES=window.CBE_RECIPES||[];
+            function mark(name,data){var r=recipes.find(function(x){return x.name===name});if(r)Object.assign(r,data)}
+            mark('Garden Herb CBE Scramble',{bf:true,bfSource:true,bfTraits:['soft texture','protein-forward','simple'],bfNote:'Soft scrambled eggs are a classic bariatric-style format: moist, easy to portion, and protein-centered. Use CBE-compatible unfertilized eggs.'});
+            mark('Mushroom-Chive CBE Frittata',{bf:true,bfSource:true,bfTraits:['protein-forward','soft texture','portionable'],bfNote:'Egg-based, soft, and easy to cut into small portions. Mushrooms add flavor without making the dish dense.'});
+            mark('Spinach-Chive Blossom Crustless Quiche',{bf:true,bfSource:true,bfTraits:['protein-forward','soft texture','portionable'],bfNote:'Crustless quiche keeps the texture soft and removes a dense crust while staying protein-centered.'});
+            var add=[
+              {name:'CBE Egg-chilada',emoji:'🥚',time:'15 min',fit:'CBE egg + tofu fit',season:'eggs',desc:'A soft rolled egg wrap filled with tofu and salsa.',ingredients:['1 CBE-compatible unfertilized egg','1 egg white','1 ounce soft crumbled tofu','2 tablespoons salsa','chives optional','black pepper'],steps:['Whisk the egg and egg white.','Cook in a lightly oiled skillet like a thin omelet.','Add tofu down the center with a little salsa.','Roll gently and top with the remaining salsa.'],note:'A CBE adaptation of a bariatric-style egg-forward breakfast. Eggs must meet the CBE continuance and welfare standard.',bf:true,bfSource:true,bfTraits:['protein-forward','soft texture','small-portion friendly'],bfNote:'Compact, moist, protein-centered, and naturally portioned.'},
+              {name:'Fluffy CBE Scrambled Eggs',emoji:'☁️',time:'10 min',fit:'CBE egg fit',season:'eggs',desc:'Very soft scrambled CBE-compatible eggs with optional chives.',ingredients:['2 CBE-compatible unfertilized eggs','black pepper','chives optional','small amount of CBE-compatible cooking fat or spray'],steps:['Whisk eggs thoroughly.','Cook gently over medium-low heat, stirring often.','Stop while the eggs are still soft and moist.','Top with chives if using.'],note:'Keep the eggs moist rather than dry. Egg sourcing must meet CBE continuance and welfare principles.',bf:true,bfSource:true,bfTraits:['soft texture','protein-forward','simple'],bfNote:'Soft scrambled eggs are a common bariatric-style protein format and are easy to portion.'},
+              {name:'CBE Spinach Egg Muffins',emoji:'🧁',time:'25 min',fit:'CBE egg + strong plant fits',season:'eggs',desc:'Small baked egg portions with finely chopped spinach and optional soft tomato.',ingredients:['6 CBE-compatible unfertilized eggs','1/2 cup finely chopped cooked spinach','small amount of finely chopped peeled tomato optional','chives','black pepper'],steps:['Beat the eggs with black pepper.','Divide spinach and optional tomato among lined muffin cups.','Pour in the egg mixture.','Bake at 375°F for 14 to 16 minutes or until just set.'],note:'The small portions are deliberate. For a softer stage, omit tomato skin and keep vegetables finely chopped.',bf:true,bfSource:true,bfTraits:['protein-forward','portionable','meal-prep friendly'],bfNote:'Naturally small portions and a soft egg texture make this especially practical for many post-op eaters.'},
+              {name:'Savory Tofu Tomato Scramble Bowl',emoji:'🍅',time:'15 min',fit:'Strong + completed-cycle fits',season:'brunch',desc:'Soft tofu with peeled tomato, chives, and basil for a warm light meal.',ingredients:['soft tofu','peeled tomato','chives','basil','olive oil optional'],steps:['Warm a small pan and gently break up the tofu.','Add peeled chopped tomato and cook until soft.','Finish with chives and basil.','Serve warm in a small bowl.'],note:'Soft tofu keeps this CBE-first while giving the meal a protein base.',bf:true,bfSource:true,bfTraits:['soft texture','protein-forward','light feel'],bfNote:'Soft, moist, easy to chew, and protein-forward without a heavy sauce or crust.'},
+              {name:'Soft Tomato Basil Protein Soup',emoji:'🍅',time:'15 min',fit:'Strong CBE fit',season:'everyday',desc:'Smooth tomato-basil soup blended with silken tofu for extra protein.',ingredients:['whole peeled tomatoes','fresh basil','silken tofu','pinch of cumin optional','black pepper','low-sodium vegetable broth as needed'],steps:['Blend tomatoes until smooth.','Add basil and silken tofu and blend again.','Warm gently, thinning with broth as needed.','Serve in a small bowl.'],note:'Silken tofu keeps the recipe CBE-aligned while adding protein and a soft texture.',bf:true,bfSource:true,bfTraits:['soft texture','protein-added','small-portion friendly'],bfNote:'Smooth, moist, easy to portion, and protein-enhanced without relying on meat.'}
+            ];
+            add.forEach(function(r){if(!recipes.some(function(x){return x.name===r.name}))recipes.push(r)});
+
+            var bfOnly=false, recipeQuery='';
+            function aliasBF(q){return /^(bf|b\.f\.|bariatric|bariatric friendly|wls|weight loss surgery|post[- ]?op)$/i.test((q||'').trim())}
+            function getRecipeForCard(card){var h=card.querySelector('h3');if(!h)return null;return recipes.find(function(x){return h.textContent.indexOf(x.name)>=0})||null}
+            function style(){
+              if(document.getElementById('cbeBfStyle'))return;
+              var s=document.createElement('style');s.id='cbeBfStyle';
+              s.textContent='.bflegend{display:flex;gap:14px;align-items:center;flex-wrap:wrap;background:#fff;border:1px solid #dce8e0;border-radius:22px;padding:16px;margin:14px 0;box-shadow:0 7px 21px #214b3810}.bflegend img{width:82px;height:82px;object-fit:contain}.bflegend h3{margin:0 0 5px}.bflegend p{margin:0;color:#61756e;font-size:12px;line-height:1.5;max-width:680px}.bfpill{display:inline-flex;align-items:center;gap:6px;background:#f3f9f4;border:1px solid #cfe2cf;border-radius:999px;padding:5px 8px;font-size:10px;font-weight:900;color:#31553c;margin:6px 5px 0 0;cursor:pointer}.bfpill:hover{background:#e8f4ed}.bfpill img{width:20px;height:20px;object-fit:contain}.bfinformed{display:inline-block;background:#fff7ea;border:1px solid #efd4a0;border-radius:999px;padding:5px 8px;font-size:10px;font-weight:900;color:#8a5a10;margin:6px 5px 0 0}.bftraits{display:flex;gap:5px;flex-wrap:wrap;margin-top:7px}.bftrait{background:#f3f7f5;border:1px solid #e0e9e4;border-radius:999px;padding:4px 7px;font-size:10px;font-weight:750;color:#526a60}.bfnote{margin-top:8px;padding:10px 11px;background:#f7faf8;border:1px solid #dce8e0;border-radius:13px;color:#526a60;font-size:11px;line-height:1.45}.bfhide{display:none!important}.bfcontrols{display:grid;grid-template-columns:1fr auto;gap:9px;margin:10px 0 4px}.bfsearch{display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #dce8e0;border-radius:18px;padding:10px 13px;box-shadow:0 7px 23px #214b3812}.bfsearch input{width:100%;border:0;outline:0;background:transparent;font-size:15px;color:#17362c}.bffilter{display:inline-flex!important;align-items:center;gap:7px}.bffilter img{width:24px;height:24px;object-fit:contain}.bfshortcut{grid-column:1/-1}.bfempty{padding:18px;border:1px dashed #cddbd3;border-radius:16px;color:#61756e;text-align:center;margin:12px 0;background:#fff}.seasonblock.bfsectionhide{display:none!important}@media(max-width:650px){.bfcontrols{grid-template-columns:1fr}.bffilter{justify-content:center}}';
+              document.head.appendChild(s)
+            }
+            function updateSeasonVisibility(){document.querySelectorAll('.seasonblock').forEach(function(section){var cards=Array.from(section.querySelectorAll('.recipe')),visible=cards.filter(function(c){return !c.classList.contains('bfhide')});section.classList.toggle('bfsectionhide',visible.length===0);var count=section.querySelector('.seasonhead span');if(count)count.textContent=visible.length+' recipe'+(visible.length===1?'':'s')})}
+            function applyRecipeFilter(){
+              var q=(recipeQuery||'').trim().toLowerCase(),alias=aliasBF(q);
+              document.querySelectorAll('.recipe').forEach(function(card){var r=getRecipeForCard(card),isBF=!!(r&&r.bf);var text=(card.textContent+' '+(r&&r.ingredients?r.ingredients.join(' '):'')+' '+(r&&r.bfTraits?r.bfTraits.join(' '):'')+' '+(isBF?' bf bariatric bariatric friendly wls weight loss surgery post op':'')).toLowerCase();var matches=alias?isBF:(!q||text.indexOf(q)>=0);card.classList.toggle('bfhide',!(matches&&(!bfOnly||isBF))) });
+              updateSeasonVisibility();
+              var empty=document.getElementById('bfRecipeEmpty'),visible=document.querySelectorAll('.recipe:not(.bfhide)').length;
+              if(!empty){empty=document.createElement('div');empty.id='bfRecipeEmpty';empty.className='bfempty';empty.style.display='none';var R=document.getElementById('recipes');if(R)R.prepend(empty)}
+              empty.style.display=visible?'none':'block';empty.textContent='No recipes match that search yet.'
+            }
+            function setBF(value){bfOnly=!!value;var b=document.getElementById('bfOnlyBtn');if(b)b.classList.toggle('active',bfOnly);applyRecipeFilter()}
+            function decorate(){
+              style();
+              var feature=document.getElementById('recipeFeature');
+              if(feature&&!document.getElementById('bfLegend')){var legend=document.createElement('div');legend.id='bfLegend';legend.className='bflegend';legend.innerHTML='<img src="'+BADGE+'" alt="BF Likely Bariatric Friendly"><div><h3>BF = Likely Bariatric Friendly</h3><p><b>CBE comes first.</b> BF is a second recipe tag for CBE recipes that also look especially practical for many post-op bariatric eaters. <b>BF-informed</b> means the design was calibrated using bariatric recipe patterns; it is not clinical verification. A future verified badge will require review of the exact CBE recipe by an appropriate bariatric professional.</p></div>';feature.insertAdjacentElement('afterend',legend)}
+              var jump=document.getElementById('recipeJump');
+              if(jump&&!document.getElementById('bfControls')){var controls=document.createElement('div');controls.id='bfControls';controls.className='bfcontrols';controls.innerHTML='<label class="bfsearch">🔎 <input id="bfRecipeSearch" type="search" autocomplete="off" placeholder="Search recipes — try tofu, BF, bariatric, WLS…"></label><button id="bfOnlyBtn" class="chip bffilter" type="button"><img src="'+BADGE+'" alt="">BF recipes</button>';jump.parentNode.insertBefore(controls,jump);var input=document.getElementById('bfRecipeSearch');input.addEventListener('input',function(){recipeQuery=input.value;applyRecipeFilter()});document.getElementById('bfOnlyBtn').onclick=function(){setBF(!bfOnly)}}
+              document.querySelectorAll('.recipe').forEach(function(card){
+                if(card.dataset.bfDecorated)return;var r=getRecipeForCard(card);if(!r)return;card.dataset.bfDecorated='1';if(!r.bf)return;card.dataset.bf='1';var head=card.querySelector('.recipehead');if(!head)return;var box=document.createElement('div');box.innerHTML='<button type="button" class="bfpill" title="Show all BF recipes"><img src="'+BADGE+'" alt="BF">BF • Likely Bariatric Friendly</button>'+(r.bfSource?'<span class="bfinformed">BF-informed</span>':'')+'<div class="bftraits">'+(r.bfTraits||[]).map(function(x){return'<span class="bftrait">'+x+'</span>'}).join('')+'</div><div class="bfnote"><b>Why BF:</b> '+(r.bfNote||'Designed around common bariatric eating considerations.')+'<br><b>Status:</b> not clinically verified yet.</div>';head.insertAdjacentElement('afterend',box);var pill=box.querySelector('.bfpill');if(pill)pill.onclick=function(){setBF(true);var controls=document.getElementById('bfControls');if(controls)controls.scrollIntoView({behavior:'smooth',block:'center'})}
+              });
+              applyRecipeFilter();
+              var mainQ=document.getElementById('q');
+              if(mainQ&&!mainQ.dataset.bfShortcutBound){mainQ.dataset.bfShortcutBound='1';mainQ.addEventListener('input',function(){setTimeout(function(){if(!aliasBF(mainQ.value))return;var foods=document.getElementById('foods'),count=document.getElementById('count');if(!foods)return;if(count)count.textContent='BF recipe results';foods.innerHTML='<article class="card bfshortcut" id="bfRecipeShortcut"><div class="top"><div class="foodname"><img src="'+BADGE+'" alt="BF" style="width:42px;height:42px;object-fit:contain"><div><h3>Likely Bariatric Friendly recipes</h3><div class="group">CBE first • BF second</div></div></div><span class="status strong">Open recipes</span></div><p class="reason">“BF,” “bariatric,” and “WLS” are recipe filters in CBE. Tap here to see only CBE recipes carrying the BF tag.</p></article>';var shortcut=document.getElementById('bfRecipeShortcut');if(shortcut)shortcut.onclick=function(){if(typeof activateTab==='function')activateTab('recipesTab');setBF(true);setTimeout(function(){var c=document.getElementById('bfControls');if(c)c.scrollIntoView({behavior:'smooth',block:'start'})},80)}},0)})}
+            }
+            window.CBE_BF_FILTER={show:function(){setBF(true)},clear:function(){setBF(false)},apply:applyRecipeFilter};
+            if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',decorate);else setTimeout(decorate,0);
+          })();'''
+
+          p.write_text(head + new_bf.replace('__BADGE__', badge))
+          PY
+          node --check cbe/processed.js
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add cbe/processed.js
+          if git diff --cached --quiet; then
+            echo "No changes needed"
+            exit 0
+          fi
+          git commit -m "Improve BF recipe filtering and search"
+          git push
