@@ -1,0 +1,41 @@
+name: One-time CBE cache bust
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Bust processed.js cache
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('cbe/index.html')
+          s=p.read_text()
+          old='processed.js?v=20260910l'
+          new='processed.js?v=20261004bf2'
+          if old in s:
+              s=s.replace(old,new)
+          elif new not in s:
+              raise SystemExit('Expected processed.js cache key not found')
+          p.write_text(s)
+          PY
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add cbe/index.html
+          if git diff --cached --quiet; then
+            echo "No changes needed"
+            exit 0
+          fi
+          git commit -m "Bust CBE BF filter cache"
+          git push
