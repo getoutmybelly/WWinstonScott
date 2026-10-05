@@ -1,0 +1,51 @@
+name: One-time CBE nav readability patch
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Improve CBE bottom navigation readability
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          p = Path('cbe/index.html')
+          s = p.read_text()
+
+          s = s.replace('.app{max-width:980px;margin:auto;padding-bottom:92px}', '.app{max-width:980px;margin:auto;padding-bottom:124px}')
+
+          old = "nav{position:fixed;z-index:10;left:50%;transform:translateX(-50%);bottom:14px;width:min(97%,820px);display:grid;grid-template-columns:repeat(5,1fr);gap:5px;padding:8px;border:1px solid var(--line);border-radius:22px;background:#ffffffed;backdrop-filter:blur(16px);box-shadow:0 14px 36px #17372a26}.nav{border:0;background:transparent;border-radius:15px;padding:8px 4px;color:#6c8178;font-size:11px;font-weight:800}.nav span{display:block;font-size:20px}.nav.active{background:#e8f4ed;color:var(--g)}"
+          new = "nav{position:fixed;z-index:10;left:50%;transform:translateX(-50%);bottom:10px;width:min(calc(100% - 20px),900px);display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:7px;padding:9px;border:1px solid var(--line);border-radius:26px;background:#fffffff2;backdrop-filter:blur(18px);box-shadow:0 14px 36px #17372a2b}.nav{position:relative;border:0;background:transparent;border-radius:18px;min-height:68px;padding:8px 3px;color:#5f746b;font-size:13px;line-height:1.12;font-weight:850;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;cursor:pointer;touch-action:manipulation}.nav span{display:block;font-size:23px;line-height:1}.nav.active{background:#e3f2e8;color:#19563f;box-shadow:inset 0 0 0 1px #c9dfd1}.nav.active:after{content:'';position:absolute;bottom:6px;width:24px;height:3px;border-radius:999px;background:#2f7657}.nav:active{transform:scale(.97)}.nav:focus-visible{outline:3px solid #80b99d;outline-offset:2px}"
+          if old not in s:
+              raise SystemExit('Desktop nav CSS target not found')
+          s = s.replace(old, new)
+
+          old_mobile = ".nav{font-size:8px;padding:8px 1px}.nav span{font-size:17px}"
+          new_mobile = ".nav{min-height:64px;font-size:12.5px;padding:8px 2px;gap:5px}.nav span{font-size:21px}nav{gap:5px;padding:8px;width:calc(100% - 16px);bottom:8px;border-radius:24px}"
+          if old_mobile not in s:
+              raise SystemExit('Mobile nav CSS target not found')
+          s = s.replace(old_mobile, new_mobile)
+
+          p.write_text(s)
+          PY
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add cbe/index.html
+          if git diff --cached --quiet; then
+            echo "No changes needed"
+            exit 0
+          fi
+          git commit -m "Improve CBE mobile navigation readability"
+          git push
