@@ -110,6 +110,8 @@
         <div class="confidence" id="confidence"></div>
         <h3>Matched correspondences</h3>
         <div id="symbols" class="symbol-list"></div>
+        <h3 style="margin-top:18px">Relevant uploaded source notes</h3>
+        <div id="sourceNotes" class="symbol-list"></div>
       </section>
     </main>
 
@@ -137,8 +139,9 @@
             <button class="secondary" id="saveG">Save correspondence</button>
           </div>
         </details>
-        <div class="actions"><button class="ghost" id="exportG">Export JSON</button><label class="ghost" style="display:inline-flex;align-items:center;cursor:pointer;margin:0;padding:10px 14px;border-radius:999px">Import JSON<input id="importG" type="file" accept="application/json" hidden></label></div>
+        <div class="actions"><button class="ghost" id="exportG">Export JSON</button><label class="ghost" style="display:inline-flex;align-items:center;cursor:pointer;margin:0;padding:10px 14px;border-radius:999px">Import JSON<input id="importG" type="file" accept="application/json" hidden></label><label class="ghost" style="display:inline-flex;align-items:center;cursor:pointer;margin:0;padding:10px 14px;border-radius:999px">Add TXT / MD<input id="importSource" type="file" accept="text/plain,text/markdown,.md,.txt" hidden></label></div>
         <div id="customList" class="custom-list"></div>
+        <div id="sourceList" class="custom-list"></div>
       </section>
     </aside>
   </div>
@@ -213,6 +216,9 @@ function renderSky(date){
 }
 function customEntries(){try{return JSON.parse(localStorage.getItem('omen-grimoire-v1')||'[]')}catch{return[]}}
 function allEntries(){return [...seed,...customEntries()]}
+function sourceDocs(){try{return JSON.parse(localStorage.getItem('omen-source-docs-v1')||'[]')}catch{return[]}}
+function tokens(text){return [...new Set((String(text).toLowerCase().match(/[a-z][a-z'-]{2,}/g)||[]).filter(x=>!['the','and','that','with','this','from','were','have','your','into','about','they','their','when','then','there','what','will','would','could','should','been','being','after','before','because','while','where','which'].includes(x)))]}
+function relevantDocs(text){const q=tokens(text);return sourceDocs().map(d=>{const body=String(d.text||'').toLowerCase();let score=0;const hit=[];for(const t of q){if(body.includes(t)){score++;hit.push(t)}}return {...d,score,hit}}).filter(d=>d.score>0).sort((a,b)=>b.score-a.score).slice(0,4)}
 function matchEntries(text){const lower=text.toLowerCase();return allEntries().map(entry=>{let hits=0;for(const k of entry.keywords||[])if(lower.includes(String(k).toLowerCase()))hits++;return {...entry,hits}}).filter(x=>x.hits>0).sort((a,b)=>b.hits-a.hits)}
 function scoreThemes(matches){const scores={};matches.forEach((m,idx)=>m.themes.forEach(t=>scores[t]=(scores[t]||0)+(Math.max(1,m.hits)*2)+(idx<3?1:0)));return Object.entries(scores).sort((a,b)=>b[1]-a[1])}
 function astroNotes(){if(!skyCache)return[];const p=skyCache.positions, notes=[];
@@ -246,6 +252,7 @@ function generate(){
  const matches=matchEntries(text);const top=scoreThemes(matches);$('patternName').textContent=patternTitle(top,matches);
  $('themes').innerHTML=top.slice(0,6).map(([t])=>`<span class="theme">${t}</span>`).join('');$('reading').innerHTML=synthesize(matches,top,activeLens);
  $('symbols').innerHTML=matches.slice(0,10).map(m=>`<div class="symbol"><strong>${m.symbol}</strong> <span class="small">· ${m.tradition}</span><div class="small" style="margin-top:5px">${m.meaning}</div><div class="source">${m.evidence==='historical'?'Historical source':'Interpretive basis'}: ${m.url?`<a target="_blank" rel="noopener" href="${m.url}">${m.source}</a>`:m.source}</div></div>`).join('')||'<div class="small">No matches yet.</div>';
+ const docs=relevantDocs(text);$('sourceNotes').innerHTML=docs.length?docs.map(d=>`<div class="symbol"><strong>${d.name}</strong><div class="small" style="margin-top:5px">Matched terms: ${d.hit.slice(0,8).join(', ')}</div><div class="source">${String(d.text).slice(0,420)}${String(d.text).length>420?'…':''}</div></div>`).join(''):'<div class="small">No uploaded source note matched this story yet.</div>';
  const hist=matches.filter(m=>m.evidence==='historical').length,context=matches.filter(m=>['contextual','interpretive'].includes(m.evidence)).length;
  $('confidence').innerHTML=`<div><b>${matches.length?'Strong':'Low'} symbolic match</b><span class="small">${matches.length} correspondence${matches.length===1?'':'s'} matched the story.</span></div><div><b>${hist?'Source-backed layer':'Interpretive layer'}</b><span class="small">${hist?`${hist} matched entry includes a historical source.`:'No historical-source entry matched this event yet.'}</span></div><div><b>${skyCache?'Calculated sky':'Sky unavailable'}</b><span class="small">${skyCache?'Planetary positions were computed for the entered time.':'The symbolic reading can still be used.'}</span></div>`;
  $('result').classList.add('on');$('result').scrollIntoView({behavior:'smooth',block:'start'}); window.__last={matches,top};
@@ -259,10 +266,12 @@ $('beeBtn').addEventListener('click',()=>{
 });
 $('locBtn').addEventListener('click',()=>{if(!navigator.geolocation){alert('Location is not available in this browser.');return}navigator.geolocation.getCurrentPosition(pos=>{geo={lat:pos.coords.latitude,lon:pos.coords.longitude};$('locBtn').textContent='Location added ✓';$('locBtn').disabled=true},()=>alert('Location permission was not granted.'))});
 function renderCustom(){const list=customEntries();$('customList').innerHTML=list.slice(-5).reverse().map(x=>`<div class="custom-item"><strong>${x.symbol}</strong><div class="small">${x.tradition||'Personal'} · ${(x.themes||[]).join(', ')}</div></div>`).join('')}
+function renderSources(){const docs=sourceDocs();$('sourceList').innerHTML=docs.length?`<div class="small">Source notes on this device: ${docs.length}</div>`:''}
 $('saveG').addEventListener('click',()=>{const symbol=$('gSymbol').value.trim(),meaning=$('gMeaning').value.trim();if(!symbol||!meaning){alert('Add at least a symbol and meaning.');return}const arr=customEntries();arr.push({symbol,keywords:$('gKeywords').value.split(',').map(x=>x.trim()).filter(Boolean),themes:$('gThemes').value.split(',').map(x=>x.trim().toLowerCase()).filter(Boolean),tradition:$('gTradition').value.trim()||'Personal Grimoire',meaning,source:$('gSource').value.trim()||'Personal entry',evidence:'personal'});localStorage.setItem('omen-grimoire-v1',JSON.stringify(arr));['gSymbol','gKeywords','gTradition','gMeaning','gThemes','gSource'].forEach(id=>$(id).value='');renderCustom()});
 $('exportG').addEventListener('click',()=>{const blob=new Blob([JSON.stringify(customEntries(),null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='omen-grimoire.json';a.click();URL.revokeObjectURL(a.href)});
 $('importG').addEventListener('change',async e=>{const f=e.target.files[0];if(!f)return;try{const data=JSON.parse(await f.text());if(!Array.isArray(data))throw new Error();localStorage.setItem('omen-grimoire-v1',JSON.stringify(data));renderCustom();alert(`Imported ${data.length} entries.`)}catch{alert('That JSON file is not a valid OMEN Grimoire export.')}});
-renderCustom();window.addEventListener('load',()=>renderSky(new Date($('eventTime').value)));
+$('importSource').addEventListener('change',async e=>{const files=[...e.target.files];if(!files.length)return;const docs=sourceDocs();for(const f of files){const text=(await f.text()).trim();if(text)docs.push({name:f.name,text,added:new Date().toISOString()})}localStorage.setItem('omen-source-docs-v1',JSON.stringify(docs));renderSources();alert(`Added ${files.length} source note${files.length===1?'':'s'}.`);e.target.value=''});
+renderCustom();renderSources();window.addEventListener('load',()=>renderSky(new Date($('eventTime').value)));
 </script>
 </body>
 </html>
