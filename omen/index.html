@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="theme-color" content="#100d19" />
+  <title>OMEN — Sign & Wonder Reader</title>
+  <meta name="description" content="A source-aware omen reader that combines symbolic correspondences, event context, and the live sky." />
+  <style>
+    :root{
+      --bg:#0d0a14; --panel:#171120; --panel2:#21182d; --ink:#f4edf8; --muted:#bcaec8;
+      --gold:#e7c77a; --violet:#a68bd4; --line:#3a2c48; --green:#9ed0b0; --red:#e0a3a3;
+      --shadow:0 22px 70px rgba(0,0,0,.35); --radius:22px;
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;background:radial-gradient(circle at 20% -10%,#322044 0,transparent 35%),linear-gradient(180deg,#0b0811,#100c17 60%,#0b0810);color:var(--ink);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh}
+    a{color:var(--gold)}
+    button,input,textarea,select{font:inherit}
+    .shell{width:min(1120px,calc(100% - 28px));margin:0 auto;padding:28px 0 72px}
+    header{display:flex;justify-content:space-between;gap:20px;align-items:flex-start;margin-bottom:28px}
+    .brand{display:flex;gap:14px;align-items:center}
+    .sigil{width:52px;height:52px;border:1px solid #5d476d;border-radius:18px;display:grid;place-items:center;background:linear-gradient(145deg,#24172f,#120d19);box-shadow:var(--shadow);font-size:27px}
+    h1{font-family:Georgia,"Times New Roman",serif;letter-spacing:.16em;font-weight:500;font-size:clamp(28px,5vw,46px);margin:0}
+    .subtitle{margin:5px 0 0;color:var(--muted);max-width:760px;line-height:1.55}
+    .pill{border:1px solid var(--line);border-radius:999px;padding:8px 11px;color:var(--muted);font-size:12px;background:#130f1b;white-space:nowrap}
+    .grid{display:grid;grid-template-columns:1.2fr .8fr;gap:18px}
+    .card{background:linear-gradient(180deg,rgba(29,21,39,.96),rgba(20,15,28,.96));border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:22px}
+    .card h2,.card h3{font-family:Georgia,"Times New Roman",serif;font-weight:500;margin:0 0 8px}
+    .eyebrow{text-transform:uppercase;letter-spacing:.16em;font-size:11px;color:var(--gold);font-weight:700}
+    .small{font-size:12px;color:var(--muted);line-height:1.55}
+    label{display:block;font-size:12px;color:#d8cade;margin:15px 0 7px;font-weight:700;letter-spacing:.02em}
+    textarea,input,select{width:100%;border:1px solid #473653;background:#100c17;color:var(--ink);border-radius:13px;padding:12px 13px;outline:none;transition:.2s}
+    textarea{min-height:205px;resize:vertical;line-height:1.55}
+    textarea:focus,input:focus,select:focus{border-color:var(--violet);box-shadow:0 0 0 3px rgba(166,139,212,.12)}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+    button{border:0;border-radius:999px;padding:11px 15px;cursor:pointer;font-weight:800;transition:transform .12s ease,opacity .12s ease}
+    button:hover{transform:translateY(-1px)}
+    .primary{background:linear-gradient(135deg,#eed58f,#c8a44d);color:#1c1421}
+    .secondary{background:#261b31;color:#e9dfed;border:1px solid #4a3858}
+    .ghost{background:transparent;border:1px solid #4a3858;color:var(--muted)}
+    .skylist,.symbol-list{display:grid;gap:9px;margin-top:14px}
+    .skyrow,.symbol{border:1px solid #382a44;border-radius:14px;padding:11px 12px;background:#120e18}
+    .skyrow{display:grid;grid-template-columns:90px 1fr auto;gap:8px;align-items:center}
+    .planet{font-weight:800}.degree{color:var(--muted);font-variant-numeric:tabular-nums}.retro{color:#e7aeae;font-size:11px;font-weight:800}.direct{color:#97c8a8;font-size:11px}
+    .result{margin-top:18px;display:none}
+    .result.on{display:block}
+    .pattern{padding:22px;border-radius:18px;background:radial-gradient(circle at 30% 0,#3a2750 0,transparent 44%),#150f1e;border:1px solid #574067;margin-bottom:14px}
+    .pattern h2{font-size:clamp(29px,6vw,50px);margin:5px 0 8px;letter-spacing:.04em}
+    .themes{display:flex;flex-wrap:wrap;gap:7px;margin:12px 0}
+    .theme{font-size:12px;border:1px solid #5c466c;background:#24182f;padding:7px 10px;border-radius:999px;color:#e9dded}
+    .reading{font-family:Georgia,"Times New Roman",serif;font-size:18px;line-height:1.72;color:#f4edf7}
+    .reading p{margin:0 0 14px}
+    .confidence{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin:15px 0}
+    .confidence div{border:1px solid #3b2e45;border-radius:14px;padding:11px;background:#110d17}.confidence b{display:block;margin-bottom:3px}
+    .source{font-size:11px;color:var(--muted);margin-top:7px}.source a{color:#ceb4ef}
+    .lensbar{display:flex;gap:7px;flex-wrap:wrap;margin:12px 0}.lens{padding:8px 10px;font-size:12px;background:#17101f;border:1px solid #3e3049;color:#cdbfd2}.lens.active{border-color:var(--gold);color:var(--gold)}
+    .aspects{margin-top:12px;display:grid;gap:7px}.aspect{font-size:12px;color:#d6cadb;border-left:2px solid #755b8b;padding-left:9px}
+    details{border-top:1px solid #372a42;margin-top:17px;padding-top:15px}summary{cursor:pointer;color:#eadcf0;font-weight:800}
+    .grimoire-form{display:grid;gap:9px;margin-top:12px}.grimoire-form textarea{min-height:90px}.custom-list{margin-top:12px;display:grid;gap:8px}.custom-item{padding:10px;border-radius:12px;border:1px solid #372a42;background:#110d17}.custom-item strong{color:var(--gold)}
+    .notice{border:1px solid #4a3c2d;background:#1b160f;border-radius:14px;padding:11px 12px;color:#d7c7a0;font-size:12px;line-height:1.5;margin-top:13px}
+    footer{margin-top:25px;color:#97899f;font-size:12px;line-height:1.6;text-align:center}
+    @media(max-width:850px){.grid{grid-template-columns:1fr}.row{grid-template-columns:1fr}header{display:block}.pill{display:inline-block;margin-top:12px}.confidence{grid-template-columns:1fr}.skyrow{grid-template-columns:78px 1fr auto}}
+  </style>
+</head>
+<body>
+<div class="shell">
+  <header>
+    <div class="brand">
+      <div class="sigil">☿</div>
+      <div><h1>OMEN</h1><p class="subtitle">A sign & wonder reader for synchronicities, animals, encounters, thresholds, dreams, numbers, and the sky above the event.</p></div>
+    </div>
+    <span class="pill">Local-first MVP · no account required</span>
+  </header>
+
+  <div class="grid">
+    <main class="card">
+      <div class="eyebrow">Tell the event</div>
+      <h2>What happened?</h2>
+      <p class="small">Give the facts in sequence. Include what felt unusual, what happened immediately before and after, and anything you noticed in your body or emotions.</p>
+      <textarea id="story" placeholder="Example: A honeybee landed on my hand. I brushed it away, it stung me and died. Minutes later..."></textarea>
+      <div class="row">
+        <div><label for="eventTime">When</label><input id="eventTime" type="datetime-local" /></div>
+        <div><label for="place">Where</label><input id="place" placeholder="City, state or meaningful place" value="Champaign, Illinois" /></div>
+      </div>
+      <div class="row">
+        <div><label for="extra">Extra signs / details</label><input id="extra" placeholder="bee, hand, ex, child, red bird, 444..." /></div>
+        <div><label for="tradition">Primary lens</label>
+          <select id="tradition"><option value="convergence">Convergence (all)</option><option value="ancestor">Ancestor-centered</option><option value="folk">Folk / omen</option><option value="astrology">Astrological</option><option value="mythic">Mythic / archetypal</option><option value="witchcraft">Witchcraft / correspondence</option></select>
+        </div>
+      </div>
+      <div class="actions">
+        <button class="primary" id="readBtn">Read the omen</button>
+        <button class="secondary" id="beeBtn">Load bee example</button>
+        <button class="ghost" id="locBtn">Use my location</button>
+      </div>
+      <div class="notice">OMEN interprets symbolism and astrology as a reflective/spiritual practice. It does not claim that coincidences prove supernatural causation, and it should not replace medical, legal, financial, or safety decisions.</div>
+
+      <section id="result" class="result" aria-live="polite">
+        <div class="pattern">
+          <div class="eyebrow">The pattern</div>
+          <h2 id="patternName">—</h2>
+          <div id="themes" class="themes"></div>
+          <div id="reading" class="reading"></div>
+        </div>
+        <div class="lensbar" id="lensbar">
+          <button class="lens active" data-lens="convergence">Convergence</button><button class="lens" data-lens="warning">Warning</button><button class="lens" data-lens="initiation">Initiation</button><button class="lens" data-lens="ancestor">Ancestors</button><button class="lens" data-lens="relationship">Relationship</button><button class="lens" data-lens="career">Career</button>
+        </div>
+        <div class="confidence" id="confidence"></div>
+        <h3>Matched correspondences</h3>
+        <div id="symbols" class="symbol-list"></div>
+      </section>
+    </main>
+
+    <aside>
+      <section class="card">
+        <div class="eyebrow">The sky</div><h2>Celestial conditions</h2>
+        <p class="small" id="skyCaption">Calculated for the event time using astronomical ephemerides in your browser.</p>
+        <div id="skyStatus" class="small">Loading astronomy engine…</div>
+        <div id="sky" class="skylist"></div>
+        <div id="aspects" class="aspects"></div>
+      </section>
+
+      <section class="card" style="margin-top:18px">
+        <div class="eyebrow">Living library</div><h2>Add to the Grimoire</h2>
+        <p class="small">Teach this browser new correspondences. Custom entries stay on this device and are included in future readings.</p>
+        <details>
+          <summary>Add a correspondence</summary>
+          <div class="grimoire-form">
+            <input id="gSymbol" placeholder="Symbol: e.g., cardinal" />
+            <input id="gKeywords" placeholder="Keywords: cardinal, red bird, bird" />
+            <input id="gTradition" placeholder="Tradition / system" />
+            <textarea id="gMeaning" placeholder="Meanings, cautions, context..." ></textarea>
+            <input id="gThemes" placeholder="Themes: message, ancestor, vitality" />
+            <input id="gSource" placeholder="Source / book / teacher / URL" />
+            <button class="secondary" id="saveG">Save correspondence</button>
+          </div>
+        </details>
+        <div class="actions"><button class="ghost" id="exportG">Export JSON</button><label class="ghost" style="display:inline-flex;align-items:center;cursor:pointer;margin:0;padding:10px 14px;border-radius:999px">Import JSON<input id="importG" type="file" accept="application/json" hidden></label></div>
+        <div id="customList" class="custom-list"></div>
+      </section>
+    </aside>
+  </div>
+  <footer>Built as a source-aware spiritual interpretation tool. Seed correspondences distinguish historical sources from modern interpretive conventions. Your story and custom Grimoire are processed locally in this version.</footer>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/astronomy-engine@2.1.19/astronomy.browser.min.js"></script>
+<script>
+const ZODIAC=['Aries','Taurus','Gemini','Cancer','Leo','Virgo','Libra','Scorpio','Sagittarius','Capricorn','Aquarius','Pisces'];
+const GLYPH={Sun:'☉',Moon:'☽',Mercury:'☿',Venus:'♀',Mars:'♂',Jupiter:'♃',Saturn:'♄',Uranus:'♅',Neptune:'♆',Pluto:'♇'};
+const PLANETS=['Sun','Moon','Mercury','Venus','Mars','Jupiter','Saturn','Uranus','Neptune','Pluto'];
+const themeLanguage={
+  boundary:'limits, consent, and the edge between one person’s world and another’s',
+  family:'family systems, belonging, and the emotional ecology of a household',
+  protection:'defense, guarding, and what becomes activated when something precious feels threatened',
+  community:'the wider social field, witnesses, reputation, and collective response',
+  agency:'what you reach for, touch, choose, or set in motion',
+  consequence:'the difference between intention and impact',
+  transition:'crossing from one role, relationship, or social space into another',
+  sacrifice:'the cost of protection, loyalty, or action',
+  sweetness:'desire, attraction, reward, nourishment, and what draws you closer',
+  visibility:'being seen, recognized, named, or brought into public awareness',
+  authority:'institutions, mentors, gatekeepers, status, and future pathways',
+  return:'the past re-entering the present',
+  communication:'messages, disclosure, speech, misunderstanding, and what must be said clearly',
+  transformation:'death/rebirth imagery, endings, irreversible change, and new form',
+  ancestor:'lineage, inherited patterns, memory, and guidance sought from those before you',
+  relationship:'attachment, intimacy, reciprocity, and competing loyalties',
+  vigilance:'attention, timing, and moving carefully rather than automatically'
+};
+const seed=[
+ {symbol:'Honeybee / hive',keywords:['bee','honeybee','hive','honey'],themes:['community','family','protection','sweetness','sacrifice'],tradition:'Classical + folk-symbolic',meaning:'The bee clusters strongly around collective life: home, shared labor, sweetness, guardianship, and the cost of defending the hive. In an omen reading, a bee often shifts attention away from the isolated individual and toward the whole social organism around them.',source:'Virgil, Georgics IV describes bees through city, home, shared offspring, ordered labor, guardianship of gates, and devotion to the collective.',url:'https://www.perseus.tufts.edu/hopper/text?doc=Verg.+G.+4&fromdoc=Perseus%3Atext%3A1999.02.0058',evidence:'historical'},
+ {symbol:'Sting / wound',keywords:['sting','stung','bite','bit','wound','hurt'],themes:['boundary','protection','consequence','vigilance'],tradition:'Omen synthesis',meaning:'A sting is read as activated defense: a boundary becomes physical. It can point to consequences that arise quickly when fear, surprise, or intrusion enters the scene, even when harm was not intended.',source:'Interpretive correspondence; use with the actual behavior and context of the animal rather than as a universal rule.',evidence:'interpretive'},
+ {symbol:'Hand',keywords:['hand','palm','finger','wrist'],themes:['agency','consequence','relationship'],tradition:'Embodied symbolism',meaning:'Hands signify agency: reaching, holding, touching, giving, receiving, making, and intervening. A sign occurring on the hand emphasizes what the person is doing or how they are entering the situation.',source:'Cross-cultural interpretive convention; not treated here as a single universal doctrine.',evidence:'interpretive'},
+ {symbol:'Death immediately after contact',keywords:['died','dead','death','killed','guts','blood'],themes:['transformation','sacrifice','consequence','vigilance'],tradition:'Mythic / omen',meaning:'Death imagery intensifies a reading. It can mark irreversibility, cost, an ending, or a demand to become more conscious of consequences. It should not automatically be read as predicting literal death.',source:'Archetypal interpretive convention.',evidence:'interpretive'},
+ {symbol:'Child / children',keywords:['child','children','kid','kids','son','daughter','daughters'],themes:['family','protection','boundary','relationship'],tradition:'Family-symbolic',meaning:'Children bring the family system into the omen. Their presence can symbolize continuity, vulnerability, loyalty, protection, and the reality that adult relationships enter an existing emotional ecosystem.',source:'Contextual/systemic interpretation.',evidence:'contextual'},
+ {symbol:'Former partner / returning past',keywords:['ex','ex-husband','ex husband','former husband','former wife','former partner'],themes:['return','relationship','boundary','family'],tradition:'Threshold symbolism',meaning:'A former partner appearing near a developing relationship places past and present in the same field. Symbolically, this can mark unfinished emotional geography, role transitions, or the need to respect existing bonds and histories.',source:'Contextual interpretation.',evidence:'contextual'},
+ {symbol:'Authority / gatekeeper',keywords:['coordinator','director','professor','boss','dean','supervisor','authority','phd'],themes:['authority','visibility','transition','community'],tradition:'Social-symbolic',meaning:'An unexpected authority figure acts as a witness from another domain of life. In convergence readings, this often highlights the crossing of private experience into institutional, vocational, or public identity.',source:'Contextual interpretation.',evidence:'contextual'},
+ {symbol:'Public witness / recognition',keywords:['people saw','noticed','asked','new man','friend','soccer moms','public'],themes:['visibility','community','relationship'],tradition:'Convergence',meaning:'When bystanders notice, name, or question a bond, the relationship has crossed from private meaning into public narrative. The omen may be less about secrecy and more about what happens when a connection becomes socially legible.',source:'Contextual interpretation.',evidence:'contextual'},
+ {symbol:'Threshold / arrival / departure',keywords:['arrived','arrival','walking up','left','leave','returned','went back','came over','bring me over'],themes:['transition','boundary','vigilance','return'],tradition:'Liminal symbolism',meaning:'Arrivals and departures are classic threshold moments. Repeated movement in and out of a scene can emphasize timing, permission, role changes, and knowing when to enter or withdraw.',source:'Liminal/archetypal interpretive convention.',evidence:'interpretive'},
+ {symbol:'Ancestor language',keywords:['ancestor','ancestors','lineage','grandmother','grandfather','spirit guide'],themes:['ancestor','communication','vigilance'],tradition:'Ancestor-centered',meaning:'When ancestral guidance is explicitly sought, the reading should favor lineage, inherited patterns, ethical remembrance, and reflective listening rather than claiming certainty about a specific dead person’s message.',source:'Methodological guardrail for ancestor-centered interpretation.',evidence:'method'}
+];
+let geo=null, skyCache=null, activeLens='convergence';
+const $=id=>document.getElementById(id);
+function setDefaultTime(){const d=new Date();d.setMinutes(d.getMinutes()-d.getTimezoneOffset());$('eventTime').value=d.toISOString().slice(0,16)}
+setDefaultTime();
+function signOf(lon){lon=((lon%360)+360)%360; const i=Math.floor(lon/30); return {sign:ZODIAC[i],degree:lon%30,index:i}}
+function fmtDegree(lon){const z=signOf(lon);return `${z.degree.toFixed(1)}° ${z.sign}`}
+function angularDelta(a,b){return ((b-a+540)%360)-180}
+function getLon(bodyName,date){const body=Astronomy.Body[bodyName]; const v=Astronomy.GeoVector(body,date,true); return Astronomy.Ecliptic(v).elon}
+function moonPhaseName(angle){angle=((angle%360)+360)%360; if(angle<22.5||angle>=337.5)return'New Moon'; if(angle<67.5)return'Waxing Crescent'; if(angle<112.5)return'First Quarter'; if(angle<157.5)return'Waxing Gibbous'; if(angle<202.5)return'Full Moon'; if(angle<247.5)return'Waning Gibbous'; if(angle<292.5)return'Last Quarter'; return'Waning Crescent'}
+function calculateSky(date){
+  const positions={};
+  for(const name of PLANETS){
+    const lon=getLon(name,date); const before=getLon(name,new Date(date.getTime()-12*3600e3)); const after=getLon(name,new Date(date.getTime()+12*3600e3));
+    positions[name]={lon,retro:!['Sun','Moon'].includes(name)&&angularDelta(before,after)<0};
+  }
+  const aspects=[]; const defs=[['conjunction',0],['sextile',60],['square',90],['trine',120],['opposition',180]];
+  for(let i=0;i<PLANETS.length;i++)for(let j=i+1;j<PLANETS.length;j++){
+    let d=Math.abs(positions[PLANETS[i]].lon-positions[PLANETS[j]].lon);d=Math.min(d,360-d);
+    for(const [name,target] of defs){const orb=Math.abs(d-target);if(orb<=4.5)aspects.push({a:PLANETS[i],b:PLANETS[j],name,orb});}
+  }
+  const phase=Astronomy.MoonPhase(date); return {positions,aspects:aspects.sort((a,b)=>a.orb-b.orb),phase,phaseName:moonPhaseName(phase)};
+}
+function renderSky(date){
+  if(!window.Astronomy){$('skyStatus').textContent='Astronomy library could not load. Symbolic readings still work.';return}
+  try{
+    skyCache=calculateSky(date);$('skyStatus').textContent=`${skyCache.phaseName} · tropical ecliptic positions`;$('sky').innerHTML='';
+    for(const name of PLANETS){const p=skyCache.positions[name];const row=document.createElement('div');row.className='skyrow';row.innerHTML=`<div class="planet">${GLYPH[name]} ${name}</div><div class="degree">${fmtDegree(p.lon)}</div><div class="${p.retro?'retro':'direct'}">${p.retro?'Rx':'direct'}</div>`;$('sky').appendChild(row)}
+    $('aspects').innerHTML=skyCache.aspects.slice(0,7).map(a=>`<div class="aspect">${a.a} ${a.name} ${a.b} · ${a.orb.toFixed(1)}° orb</div>`).join('')||'<div class="small">No major aspects within the display orb.</div>';
+  }catch(e){console.error(e);$('skyStatus').textContent='Could not calculate the sky for this time.'}
+}
+function customEntries(){try{return JSON.parse(localStorage.getItem('omen-grimoire-v1')||'[]')}catch{return[]}}
+function allEntries(){return [...seed,...customEntries()]}
+function matchEntries(text){const lower=text.toLowerCase();return allEntries().map(entry=>{let hits=0;for(const k of entry.keywords||[])if(lower.includes(String(k).toLowerCase()))hits++;return {...entry,hits}}).filter(x=>x.hits>0).sort((a,b)=>b.hits-a.hits)}
+function scoreThemes(matches){const scores={};matches.forEach((m,idx)=>m.themes.forEach(t=>scores[t]=(scores[t]||0)+(Math.max(1,m.hits)*2)+(idx<3?1:0)));return Object.entries(scores).sort((a,b)=>b[1]-a[1])}
+function astroNotes(){if(!skyCache)return[];const p=skyCache.positions, notes=[];
+ const moon=signOf(p.Moon.lon).sign, venus=signOf(p.Venus.lon).sign, saturn=signOf(p.Saturn.lon).sign, mars=signOf(p.Mars.lon).sign;
+ notes.push(`The Moon in ${moon} describes the emotional weather of the moment; Venus in ${venus} colors relationship and value questions; Mars in ${mars} describes how action and friction are expressed; Saturn in ${saturn} emphasizes the form taken by limits, responsibility, and consequence.`);
+ if(skyCache.aspects.length){const a=skyCache.aspects[0];notes.push(`The tightest major aspect in this event chart is ${a.a} ${a.name} ${a.b} (${a.orb.toFixed(1)}° orb), making that planetary pair especially worth examining in a deeper astrological reading.`)}
+ return notes;
+}
+const lensText={
+ convergence:'Read the sequence as a whole rather than treating each symbol as an isolated fortune-cookie meaning.',
+ warning:'Treat the omen as cautionary information: where could speed, projection, or crossed boundaries create unnecessary harm?',
+ initiation:'Treat the event as an initiation: what new responsibility is being asked of you now that the situation is becoming real?',
+ ancestor:'Read for lineage and inherited patterns. Ask what kind of conduct would make your ancestors proud without pretending certainty about a literal message from a specific spirit.',
+ relationship:'Center attachment, family systems, reciprocity, public visibility, and the difference between being invited into a moment and belonging to an entire relational ecosystem.',
+ career:'Center crossings between private life and vocation: witnesses, reputation, authority figures, institutions, and how one domain of life may now be touching another.'
+};
+function patternTitle(top,matches){const names=top.slice(0,2).map(x=>x[0]);if(names.includes('family')&&names.includes('boundary'))return'THE HIVE & THE THRESHOLD';if(names.includes('visibility')&&names.includes('authority'))return'THE WITNESS AT THE CROSSROADS';if(names.includes('relationship')&&names.includes('return'))return'THE PAST ENTERS THE PRESENT';if(matches.some(m=>m.symbol.includes('Honeybee')))return'THE HIVE SPEAKS AT THE THRESHOLD';return `THE ${String(names[0]||'SIGN').toUpperCase()} & ${String(names[1]||'CROSSING').toUpperCase()}`}
+function synthesize(matches,top,lens){
+  if(!matches.length)return `<p>No seeded symbol matched strongly enough yet. Add the unusual objects, animals, numbers, encounters, or actions to “Extra signs,” or teach the Grimoire a new correspondence.</p>`;
+  const t=top.slice(0,4).map(x=>x[0]); const descriptions=t.map(x=>themeLanguage[x]||x);
+  const first=matches[0], second=matches[1];
+  let p1=`<p>In an omen-reading frame, this event clusters around <strong>${t.slice(0,3).join(', ')}</strong>. The strongest symbol here is <strong>${first.symbol}</strong>${second?`, reinforced by <strong>${second.symbol}</strong>`:''}. Together they pull the reading toward ${descriptions.slice(0,3).join('; ')}.</p>`;
+  let p2=`<p>${lensText[lens]||lensText.convergence} The useful question is not “What fate has been guaranteed?” but “What pattern became visible here, and what kind of conduct does that pattern ask from me?”</p>`;
+  const a=astroNotes();let p3=a.length?`<p><strong>Astrological layer.</strong> ${a.join(' ')}</p>`:'';
+  let p4='';if(first.symbol.includes('Honeybee'))p4=`<p><strong>Bee-specific reading.</strong> Because the bee is a hive creature, its appearance makes the surrounding social system part of the sign. A sting adds defense and boundary. If the bee dies after the contact, consequence and sacrifice intensify the scene. The omen therefore reads less like “good luck/bad luck” and more like a request to approach sweetness without forgetting the hive that protects it.</p>`;
+  return p1+p2+p4+p3;
+}
+function generate(){
+ const story=$('story').value.trim(),extra=$('extra').value.trim(), text=`${story} ${extra}`.trim(); if(!text){$('story').focus();return}
+ const raw=$('eventTime').value;const date=raw?new Date(raw):new Date();renderSky(date);
+ const matches=matchEntries(text);const top=scoreThemes(matches);$('patternName').textContent=patternTitle(top,matches);
+ $('themes').innerHTML=top.slice(0,6).map(([t])=>`<span class="theme">${t}</span>`).join('');$('reading').innerHTML=synthesize(matches,top,activeLens);
+ $('symbols').innerHTML=matches.slice(0,10).map(m=>`<div class="symbol"><strong>${m.symbol}</strong> <span class="small">· ${m.tradition}</span><div class="small" style="margin-top:5px">${m.meaning}</div><div class="source">${m.evidence==='historical'?'Historical source':'Interpretive basis'}: ${m.url?`<a target="_blank" rel="noopener" href="${m.url}">${m.source}</a>`:m.source}</div></div>`).join('')||'<div class="small">No matches yet.</div>';
+ const hist=matches.filter(m=>m.evidence==='historical').length,context=matches.filter(m=>['contextual','interpretive'].includes(m.evidence)).length;
+ $('confidence').innerHTML=`<div><b>${matches.length?'Strong':'Low'} symbolic match</b><span class="small">${matches.length} correspondence${matches.length===1?'':'s'} matched the story.</span></div><div><b>${hist?'Source-backed layer':'Interpretive layer'}</b><span class="small">${hist?`${hist} matched entry includes a historical source.`:'No historical-source entry matched this event yet.'}</span></div><div><b>${skyCache?'Calculated sky':'Sky unavailable'}</b><span class="small">${skyCache?'Planetary positions were computed for the entered time.':'The symbolic reading can still be used.'}</span></div>`;
+ $('result').classList.add('on');$('result').scrollIntoView({behavior:'smooth',block:'start'}); window.__last={matches,top};
+}
+$('readBtn').addEventListener('click',generate);$('eventTime').addEventListener('change',()=>renderSky(new Date($('eventTime').value)));
+$('lensbar').addEventListener('click',e=>{if(!e.target.dataset.lens)return;activeLens=e.target.dataset.lens;document.querySelectorAll('.lens').forEach(x=>x.classList.toggle('active',x===e.target));if(window.__last){$('reading').innerHTML=synthesize(window.__last.matches,window.__last.top,activeLens)}});
+$('beeBtn').addEventListener('click',()=>{
+ $('story').value=`A woman I am close to told her children about me the day before. Two daughters were unhappy and asked that I not be brought over when they were there. The next day she invited me to her son's soccer game. While we were talking, a honeybee landed on my hand. I brushed it away because I was startled and accidentally frightened it. It stung me and died, leaving the stinger in my hand, and I felt genuinely sad. I stood up to return my folding chair and unexpectedly ran into the person who oversees our PhD program; she knows my friend professionally and they are writing a grant together. I went back, and my friend told me her son was on the field. I misunderstood and thought she meant her ex-husband. She clarified that her ex had in fact arrived about thirty seconds earlier. I chose to leave because I did not want my presence to cause him pain. Later, other parents apparently noticed us and asked if I was her new man friend.`;
+ $('extra').value='bee, hand, sting, death, children, ex-husband, PhD coordinator, public recognition, arrival, departure';
+ generate();
+});
+$('locBtn').addEventListener('click',()=>{if(!navigator.geolocation){alert('Location is not available in this browser.');return}navigator.geolocation.getCurrentPosition(pos=>{geo={lat:pos.coords.latitude,lon:pos.coords.longitude};$('locBtn').textContent='Location added ✓';$('locBtn').disabled=true},()=>alert('Location permission was not granted.'))});
+function renderCustom(){const list=customEntries();$('customList').innerHTML=list.slice(-5).reverse().map(x=>`<div class="custom-item"><strong>${x.symbol}</strong><div class="small">${x.tradition||'Personal'} · ${(x.themes||[]).join(', ')}</div></div>`).join('')}
+$('saveG').addEventListener('click',()=>{const symbol=$('gSymbol').value.trim(),meaning=$('gMeaning').value.trim();if(!symbol||!meaning){alert('Add at least a symbol and meaning.');return}const arr=customEntries();arr.push({symbol,keywords:$('gKeywords').value.split(',').map(x=>x.trim()).filter(Boolean),themes:$('gThemes').value.split(',').map(x=>x.trim().toLowerCase()).filter(Boolean),tradition:$('gTradition').value.trim()||'Personal Grimoire',meaning,source:$('gSource').value.trim()||'Personal entry',evidence:'personal'});localStorage.setItem('omen-grimoire-v1',JSON.stringify(arr));['gSymbol','gKeywords','gTradition','gMeaning','gThemes','gSource'].forEach(id=>$(id).value='');renderCustom()});
+$('exportG').addEventListener('click',()=>{const blob=new Blob([JSON.stringify(customEntries(),null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='omen-grimoire.json';a.click();URL.revokeObjectURL(a.href)});
+$('importG').addEventListener('change',async e=>{const f=e.target.files[0];if(!f)return;try{const data=JSON.parse(await f.text());if(!Array.isArray(data))throw new Error();localStorage.setItem('omen-grimoire-v1',JSON.stringify(data));renderCustom();alert(`Imported ${data.length} entries.`)}catch{alert('That JSON file is not a valid OMEN Grimoire export.')}});
+renderCustom();window.addEventListener('load',()=>renderSky(new Date($('eventTime').value)));
+</script>
+</body>
+</html>
