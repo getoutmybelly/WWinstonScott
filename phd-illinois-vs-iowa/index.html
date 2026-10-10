@@ -3,255 +3,85 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>PhD Decision Desk | Illinois vs Iowa</title>
-<meta name="description" content="W Winston Scott's Fall 2027 Social Work PhD decision dashboard: University of Illinois Urbana-Champaign vs University of Iowa." />
+<title>PhD Decision Desk | Illinois · UIC · Iowa</title>
+<meta name="description" content="W Winston Scott's Fall 2027 Social Work PhD decision dashboard: UIUC, UIC Jane Addams, and Iowa." />
 <style>
 :root{
-  --illinois-navy:#13294B;
-  --illinois-orange:#FF5F05;
-  --iowa-black:#000000;
-  --iowa-gold:#FFCD00;
-  --ink:#172033;
-  --muted:#647086;
-  --paper:#F5F7FA;
-  --card:#FFFFFF;
-  --line:#DCE2EA;
-  --good:#18794E;
-  --warn:#9A6700;
-  --shadow:0 18px 50px rgba(18,31,53,.10);
+  --uiuc-navy:#13294B;--uiuc-orange:#FF5F05;
+  --uic-blue:#001E62;--uic-red:#D50032;
+  --iowa-black:#000;--iowa-gold:#FFCD00;
+  --ink:#172033;--muted:#657086;--paper:#F5F7FA;--card:#fff;--line:#DCE2EA;
+  --good:#18794E;--warn:#8A5A00;--shadow:0 18px 50px rgba(18,31,53,.10)
 }
-*{box-sizing:border-box}
-html{scroll-behavior:smooth}
-body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--ink);background:var(--paper);line-height:1.55}
-a{color:inherit}
-.hero{position:relative;overflow:hidden;background:linear-gradient(112deg,var(--illinois-navy) 0 47%,#263142 47% 53%,var(--iowa-black) 53% 100%);color:white;padding:72px 20px 56px}
-.hero:before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(255,95,5,.16),transparent 34%,transparent 66%,rgba(255,205,0,.15));pointer-events:none}
-.wrap{max-width:1180px;margin:auto;position:relative}
-.eyebrow{font-weight:800;letter-spacing:.16em;text-transform:uppercase;font-size:.76rem;opacity:.82}
-h1{font-size:clamp(2.5rem,7vw,5.8rem);line-height:.94;margin:.5rem 0 1rem;letter-spacing:-.055em}
-.hero p{max-width:850px;font-size:1.12rem;color:#E8EDF6;margin:0}
-.dual-line{height:7px;display:grid;grid-template-columns:1fr 1fr;margin-top:38px}.dual-line span:first-child{background:var(--illinois-orange)}.dual-line span:last-child{background:var(--iowa-gold)}
-.quicknav{background:white;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:20;box-shadow:0 6px 20px rgba(20,31,48,.05)}
-.quicknav .wrap{display:flex;gap:10px;overflow:auto;padding:11px 20px}
-.quicknav a{text-decoration:none;white-space:nowrap;padding:8px 12px;border-radius:999px;font-size:.9rem;font-weight:700;background:#F1F4F8}
-main{padding:34px 20px 80px}
-section{margin:0 auto 46px}
-h2{font-size:clamp(1.75rem,3vw,2.55rem);letter-spacing:-.035em;margin:0 0 10px}
-.lead{color:var(--muted);max-width:850px;margin:0 0 24px;font-size:1.04rem}
-.grid{display:grid;gap:18px}.two{grid-template-columns:repeat(2,minmax(0,1fr))}.three{grid-template-columns:repeat(3,minmax(0,1fr))}.four{grid-template-columns:repeat(4,minmax(0,1fr))}
-.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:22px;box-shadow:0 8px 26px rgba(21,34,52,.04)}
-.card h3{margin:0 0 8px;font-size:1.12rem}.card p{margin:.35rem 0;color:#46536A}
-.school-card{padding:0;overflow:hidden}.school-head{padding:21px 22px;color:white}.illinois .school-head{background:var(--illinois-navy);border-top:8px solid var(--illinois-orange)}.iowa .school-head{background:#101010;border-top:8px solid var(--iowa-gold)}
-.school-head h3{font-size:1.6rem;margin:0}.school-head small{opacity:.8}.school-body{padding:22px}
-.big-score{font-size:4.1rem;line-height:1;font-weight:900;letter-spacing:-.07em}.illinois .big-score{color:var(--illinois-orange)}.iowa .big-score{color:#B88700}
-.badge{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:6px 10px;font-weight:800;font-size:.78rem;background:#EEF2F7;color:#334057;margin:4px 4px 4px 0}.badge.good{background:#E8F5EE;color:var(--good)}.badge.warn{background:#FFF5D6;color:#765300}
-.callout{border-radius:20px;padding:28px;box-shadow:var(--shadow);background:white;border:1px solid var(--line)}
-.callout.signal{border-left:8px solid var(--illinois-orange);background:linear-gradient(135deg,#fff 0,#FFF7F1 100%)}
-.quote{font-size:clamp(1.35rem,2.6vw,2rem);line-height:1.25;font-weight:850;letter-spacing:-.025em;margin:0 0 12px;color:var(--illinois-navy)}
-.compare{width:100%;border-collapse:separate;border-spacing:0;background:white;border:1px solid var(--line);border-radius:18px;overflow:hidden;box-shadow:0 8px 26px rgba(21,34,52,.04)}
-.compare th,.compare td{padding:15px 16px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}.compare th{font-size:.83rem;text-transform:uppercase;letter-spacing:.07em;color:#536078;background:#F8FAFC}.compare tr:last-child td{border-bottom:0}.uill{border-left:5px solid var(--illinois-orange)}.uiowa{border-left:5px solid var(--iowa-gold)}
-.metric{display:flex;justify-content:space-between;gap:12px;margin:13px 0 7px;font-weight:800}.bar{height:10px;background:#E8ECF2;border-radius:99px;overflow:hidden}.fill{height:100%;border-radius:99px}.fill.il{background:linear-gradient(90deg,var(--illinois-navy),var(--illinois-orange))}.fill.ia{background:linear-gradient(90deg,#111,var(--iowa-gold))}
-.research-card{position:relative;overflow:hidden}.research-card:before{content:"";position:absolute;width:90px;height:90px;border-radius:50%;right:-35px;top:-35px;background:#F1F4F8}
-.research-card strong{display:block;color:var(--illinois-navy);margin-bottom:5px}
-.timeline{position:relative;padding-left:25px}.timeline:before{content:"";position:absolute;left:7px;top:5px;bottom:5px;width:3px;background:linear-gradient(var(--illinois-orange),var(--iowa-gold));border-radius:3px}.step{position:relative;margin:0 0 20px}.step:before{content:"";position:absolute;width:15px;height:15px;border-radius:50%;background:white;border:4px solid var(--illinois-navy);left:-25px;top:5px}.step h3{margin:0 0 3px;font-size:1rem}.step p{margin:0;color:var(--muted)}
-.matrix{display:grid;grid-template-columns:1.5fr .8fr .8fr .8fr;gap:1px;background:var(--line);border:1px solid var(--line);border-radius:16px;overflow:hidden}.matrix>div{background:white;padding:13px}.matrix .head{font-weight:900;background:#F1F4F8}.score{text-align:center;font-weight:900}.why{font-size:.9rem;color:#56637A}
-.verdict{background:linear-gradient(135deg,var(--illinois-navy),#1D3A67);color:white;border-radius:24px;padding:30px;box-shadow:var(--shadow);position:relative;overflow:hidden}.verdict:after{content:"IOWA";position:absolute;right:-8px;bottom:-28px;font-size:6rem;font-weight:950;color:rgba(255,205,0,.08);letter-spacing:-.08em}.verdict h2{color:white}.verdict .rank{color:#FFD6C0;font-weight:900;text-transform:uppercase;letter-spacing:.08em}.verdict p{max-width:900px;color:#ECF1F9}.verdict strong{color:white}
-.sources{font-size:.9rem;color:#5E6A7D}.sources a{color:#2A5AA8;text-decoration-thickness:1px;text-underline-offset:2px}.source-list{columns:2;column-gap:34px;padding-left:20px}.source-list li{break-inside:avoid;margin:0 0 10px}
-.footer{padding:30px 20px;background:#10131A;color:#AEB8C8;text-align:center;font-size:.9rem}.footer strong{color:white}
-.note{font-size:.86rem;color:#6B768A}.check{font-weight:900;color:var(--good)}.caution{font-weight:900;color:var(--warn)}
-@media(max-width:850px){.two,.three,.four{grid-template-columns:1fr}.matrix{grid-template-columns:1.2fr .6fr .6fr}.matrix .whycol{display:none}.source-list{columns:1}.hero{padding-top:56px}.compare{font-size:.9rem}}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--ink);background:var(--paper);line-height:1.55}a{color:inherit}.wrap{max-width:1200px;margin:auto;position:relative}
+.hero{position:relative;overflow:hidden;background:linear-gradient(105deg,var(--uiuc-navy) 0 33%,var(--uic-blue) 33% 66%,#111 66% 100%);color:#fff;padding:72px 20px 56px}.hero:after{content:"";position:absolute;inset:auto 0 0;height:8px;background:linear-gradient(90deg,var(--uiuc-orange) 0 33%,var(--uic-red) 33% 66%,var(--iowa-gold) 66%)}.eyebrow{font-weight:850;letter-spacing:.15em;text-transform:uppercase;font-size:.76rem;opacity:.8}h1{font-size:clamp(2.5rem,7vw,5.7rem);line-height:.94;margin:.5rem 0 1rem;letter-spacing:-.055em}.hero p{max-width:920px;font-size:1.12rem;color:#EDF2F8;margin:0}.quicknav{position:sticky;top:0;z-index:20;background:#fff;border-bottom:1px solid var(--line);box-shadow:0 6px 20px rgba(20,31,48,.05)}.quicknav .wrap{display:flex;gap:9px;overflow:auto;padding:11px 20px}.quicknav a{text-decoration:none;white-space:nowrap;padding:8px 12px;border-radius:999px;background:#F1F4F8;font-size:.9rem;font-weight:750}
+main{padding:34px 20px 80px}section{margin:0 auto 48px}h2{font-size:clamp(1.8rem,3vw,2.55rem);letter-spacing:-.035em;margin:0 0 10px}.lead{color:var(--muted);max-width:900px;margin:0 0 24px;font-size:1.04rem}.grid{display:grid;gap:18px}.three{grid-template-columns:repeat(3,minmax(0,1fr))}.four{grid-template-columns:repeat(4,minmax(0,1fr))}.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:22px;box-shadow:0 8px 26px rgba(21,34,52,.04)}.school-card{padding:0;overflow:hidden}.school-head{padding:21px 22px;color:#fff}.uiuc .school-head{background:var(--uiuc-navy);border-top:8px solid var(--uiuc-orange)}.uic .school-head{background:var(--uic-blue);border-top:8px solid var(--uic-red)}.iowa .school-head{background:#111;border-top:8px solid var(--iowa-gold)}.school-head h3{font-size:1.45rem;margin:2px 0 0}.school-head small{opacity:.8}.school-body{padding:22px}.big-score{font-size:4rem;line-height:1;font-weight:950;letter-spacing:-.07em}.uiuc .big-score{color:var(--uiuc-orange)}.uic .big-score{color:var(--uic-red)}.iowa .big-score{color:#B88700}.badge{display:inline-flex;border-radius:999px;padding:6px 10px;font-weight:800;font-size:.78rem;background:#EEF2F7;color:#334057;margin:4px 4px 4px 0}.badge.good{background:#E8F5EE;color:var(--good)}.badge.warn{background:#FFF4D2;color:#765300}.callout{border-radius:20px;padding:28px;background:#fff;border:1px solid var(--line);box-shadow:var(--shadow)}.callout.signal{border-left:8px solid var(--uiuc-orange);background:linear-gradient(135deg,#fff,#FFF7F1)}.quote{font-size:clamp(1.35rem,2.6vw,2rem);line-height:1.25;font-weight:850;letter-spacing:-.025em;margin:0 0 12px;color:var(--uiuc-navy)}
+.compare{width:100%;border-collapse:separate;border-spacing:0;background:#fff;border:1px solid var(--line);border-radius:18px;overflow:hidden;box-shadow:0 8px 26px rgba(21,34,52,.04)}.compare th,.compare td{padding:14px 15px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}.compare th{font-size:.78rem;text-transform:uppercase;letter-spacing:.06em;color:#536078;background:#F8FAFC}.compare tr:last-child td{border-bottom:0}.uiuc-col{border-left:5px solid var(--uiuc-orange)}.uic-col{border-left:5px solid var(--uic-red)}.iowa-col{border-left:5px solid var(--iowa-gold)}.research strong{display:block;margin-bottom:5px}.research.uiuc strong{color:var(--uiuc-navy)}.research.uic strong{color:var(--uic-blue)}.research.iowa strong{color:#111}.matrix{display:grid;grid-template-columns:1.45fr repeat(3,.7fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:16px;overflow:hidden}.matrix>div{background:#fff;padding:13px}.matrix .head{font-weight:900;background:#F1F4F8}.score{text-align:center;font-weight:900}.timeline{position:relative;padding-left:25px}.timeline:before{content:"";position:absolute;left:7px;top:5px;bottom:5px;width:3px;background:linear-gradient(var(--uiuc-orange),var(--uic-red),var(--iowa-gold));border-radius:3px}.step{position:relative;margin:0 0 20px}.step:before{content:"";position:absolute;width:15px;height:15px;border-radius:50%;background:#fff;border:4px solid var(--uiuc-navy);left:-25px;top:5px}.step h3{margin:0 0 3px;font-size:1rem}.step p{margin:0;color:var(--muted)}.verdict{background:linear-gradient(135deg,var(--uiuc-navy),#1D3A67);color:#fff;border-radius:24px;padding:30px;box-shadow:var(--shadow)}.verdict p{max-width:920px;color:#ECF1F9}.rank{font-weight:900;text-transform:uppercase;letter-spacing:.08em;color:#FFD6C0}.sources{font-size:.9rem;color:#5E6A7D}.sources a{color:#275BA7}.source-list{columns:2;column-gap:34px;padding-left:20px}.source-list li{break-inside:avoid;margin:0 0 10px}.note{font-size:.86rem;color:#6B768A}.check{font-weight:900;color:var(--good)}.caution{font-weight:900;color:var(--warn)}.footer{padding:30px 20px;background:#10131A;color:#AEB8C8;text-align:center;font-size:.9rem}.footer strong{color:#fff}
+@media(max-width:900px){.three,.four{grid-template-columns:1fr}.matrix{grid-template-columns:1.2fr repeat(3,.55fr)}.source-list{columns:1}.compare{font-size:.88rem}.hero{padding-top:56px}}
 </style>
 </head>
 <body>
-<header class="hero">
-  <div class="wrap">
-    <div class="eyebrow">W Winston Scott · Fall 2027 PhD Decision Desk</div>
-    <h1>Illinois <span style="color:#FF8A49">vs.</span> <span style="color:#FFCD00">Iowa</span></h1>
-    <p>Two legitimate Social Work PhD paths. One already has relationships, momentum, and a faculty signal. The other has unusually strong alignment with AI, economic hardship, mental health, and interdisciplinary research.</p>
-    <div class="dual-line"><span></span><span></span></div>
-  </div>
-</header>
-<nav class="quicknav"><div class="wrap">
-  <a href="#signal">Today's signal</a><a href="#snapshot">At a glance</a><a href="#research">Research fit</a><a href="#faculty">Faculty fit</a><a href="#admissions">Admissions</a><a href="#matrix">Decision matrix</a><a href="#timeline">Action plan</a><a href="#michelle">For Michelle</a>
-</div></nav>
+<header class="hero"><div class="wrap"><div class="eyebrow">W Winston Scott · Fall 2027 PhD Decision Desk</div><h1>Illinois · UIC · Iowa</h1><p>Three credible Social Work PhD paths. Illinois has the strongest current relationship and pipeline advantage. Jane Addams brings an unusually direct social/economic-justice mission and strong fellowship upside. Iowa remains a serious research-fit competitor.</p></div></header>
+<nav class="quicknav"><div class="wrap"><a href="#signal">Illinois signal</a><a href="#snapshot">At a glance</a><a href="#admissions">Admissions</a><a href="#research">Research fit</a><a href="#matrix">Decision matrix</a><a href="#timeline">Action plan</a><a href="#michelle">For Michelle</a></div></nav>
 <main class="wrap">
+<section id="signal"><div class="callout signal"><div class="eyebrow" style="color:#8B3E12">October 2026 · Illinois signal</div><p class="quote">The PhD idea moved from “something I might do” to “a professor independently saw a research pipeline in how I think.”</p><p>After Program Evaluation, Winston stayed behind to talk with <strong>Dr. Moses Okumu</strong>. The conversation moved from classroom reasoning to AI, Skybound, and research. When Winston described the ethical discomfort he sees in life-insurance markets serving economically vulnerable families, Okumu identified it as a researchable project. Winston also described questions about bariatric-surgery aftermath, inconsistent guidance, and post-operative support. Okumu encouraged him to pursue the <strong>PhD pipeline</strong> and discussed ways Illinois resources could potentially help continue developing Skybound.</p><p class="note">This is meaningful faculty encouragement and research alignment, not an admissions or funding guarantee.</p></div></section>
 
-<section id="signal">
-  <div class="callout signal">
-    <div class="eyebrow" style="color:#8B3E12">October 6, 2026 · Illinois signal</div>
-    <p class="quote">The PhD idea moved from “something I might do” to “a professor independently saw a research pipeline in how I think.”</p>
-    <p>After SOCW 542 Program Evaluation, Winston stayed behind to talk with <strong>Dr. Moses Okumu</strong>. The conversation started with Winston explaining that he sometimes stays quiet when classmates are confused because he thinks he may be on the wrong page. Okumu recognized the opposite possibility: the material was being heavily scaffolded, and Winston had been independently reconstructing the logic rather than simply following the displayed answer.</p>
-    <p>The conversation then moved into AI, Skybound, and research. When Winston described the ethical discomfort he sees in life-insurance markets serving economically vulnerable families, and the structural question of whether their children are likely to inherit the same vulnerability, Okumu responded that this was <strong>a research project</strong>. Winston also described questions about bariatric-surgery aftermath, inconsistent guidance, and post-operative support. Okumu encouraged him to pursue the <strong>PhD pipeline</strong> and discussed ways Illinois could potentially help him continue developing Skybound.</p>
-    <p class="note">Context, not an admissions guarantee: this is evidence of faculty encouragement and research alignment, not a promise of admission or funding.</p>
-  </div>
-</section>
+<section id="snapshot"><h2>At a glance</h2><p class="lead">The goal is not to pick one school today. It is to identify where Winston's current evidence, research interests, funding prospects, and family/logistics fit best before applications are due.</p><div class="grid three">
+<article class="card school-card uiuc"><div class="school-head"><small>UNIVERSITY OF ILLINOIS URBANA-CHAMPAIGN</small><h3>Illinois Social Work PhD</h3></div><div class="school-body"><div class="big-score">91</div><div class="note">Current strategic fit / 100</div><p><span class="badge good">#1 current target</span><span class="badge good">Existing faculty relationship</span><span class="badge">No new school transition</span></p><p><strong>Why it leads:</strong> Winston is already inside the School, has faculty visibility, and can build research evidence before the application is reviewed.</p></div></article>
+<article class="card school-card uic"><div class="school-head"><small>UNIVERSITY OF ILLINOIS CHICAGO · JANE ADDAMS</small><h3>UIC PhD in Social Work</h3></div><div class="school-body"><div class="big-score">87</div><div class="note">Current strategic fit / 100</div><p><span class="badge good">Serious #2</span><span class="badge good">Justice mission fit</span><span class="badge good">Strong fellowship upside</span></p><p><strong>Why it jumps into contention:</strong> Jane Addams explicitly centers social and economic justice, vulnerable urban populations, policy, and practice scholarship. That fits the structural questions behind Winston's insurance, access, and intervention interests.</p></div></article>
+<article class="card school-card iowa"><div class="school-head"><small>THE UNIVERSITY OF IOWA</small><h3>Iowa Social Work PhD</h3></div><div class="school-body"><div class="big-score">82</div><div class="note">Current strategic fit / 100</div><p><span class="badge good">Strong #3</span><span class="badge good">AI/economic-hardship fit</span><span class="badge">Clear funding language</span></p><p><strong>Why it stays on the list:</strong> Iowa remains particularly attractive for interdisciplinary work around AI, economic hardship, mental health, and evaluation.</p></div></article>
+</div></section>
 
-<section id="snapshot">
-  <h2>At a glance</h2>
-  <p class="lead">Both programs can take an applicant coming from an MSW. The current strategic difference is that Illinois has unusually strong local momentum; Iowa has clearer published Fall 2027 admissions and funding language.</p>
-  <div class="grid two">
-    <article class="card school-card illinois">
-      <div class="school-head"><small>UNIVERSITY OF ILLINOIS URBANA-CHAMPAIGN</small><h3>Illinois Social Work PhD</h3></div>
-      <div class="school-body">
-        <div class="big-score">91</div><div class="note">Current strategic fit score / 100</div>
-        <p><span class="badge good">#1 current target</span><span class="badge good">Existing faculty relationship</span><span class="badge">No relocation</span></p>
-        <p><strong>Why it leads:</strong> Winston is already inside the School, Dr. Okumu's research overlaps multiple emerging interests, and today's conversation created a natural next step toward research involvement.</p>
-      </div>
-    </article>
-    <article class="card school-card iowa">
-      <div class="school-head"><small>THE UNIVERSITY OF IOWA</small><h3>Iowa Social Work PhD</h3></div>
-      <div class="school-body">
-        <div class="big-score">82</div><div class="note">Current strategic fit score / 100</div>
-        <p><span class="badge good">Serious #2</span><span class="badge good">Funding language is clearer</span><span class="badge">Strong AI/equity fit</span></p>
-        <p><strong>Why it stays on the list:</strong> Iowa has faculty working directly at the intersection of AI, economic hardship, vulnerable systems, mental health, and evaluation, plus a deliberately interdisciplinary PhD structure.</p>
-      </div>
-    </article>
-  </div>
-</section>
+<section id="admissions"><h2>Admissions + structure</h2><p class="lead">All three are viable MSW-to-PhD routes. UIC is the clearest on dates right now, and its early deadline is strategically important because it is tied to fellowship consideration.</p><div style="overflow:auto"><table class="compare"><thead><tr><th>Question</th><th>Illinois</th><th>UIC Jane Addams</th><th>Iowa</th></tr></thead><tbody>
+<tr><td><strong>MSW → PhD?</strong></td><td class="uiuc-col"><span class="check">Yes.</span> Post-master's doctoral route.</td><td class="uic-col"><span class="check">Yes.</span> UIC explicitly says the program is open to applicants with an MSW; applicants without one generally must complete MSW requirements before doctoral coursework.</td><td class="iowa-col"><span class="check">Yes.</span> MSW is a standard route into the doctorate.</td></tr>
+<tr><td><strong>Fall 2027 deadline</strong></td><td class="uiuc-col"><span class="caution">2027 direct-PhD date needs confirmation.</span> Use Dec. 1 as the internal planning target until the new cycle is posted.</td><td class="uic-col"><strong>Dec. 15 early / Feb. 15 final.</strong> Early applicants receive decisions by end of January and are eligible for University Fellowship nomination.</td><td class="iowa-col"><strong>Feb. 1, 2027.</strong></td></tr>
+<tr><td><strong>GRE</strong></td><td class="uiuc-col">Check current cycle instructions.</td><td class="uic-col"><strong>Not required.</strong></td><td class="iowa-col">Check current cycle instructions.</td></tr>
+<tr><td><strong>Academic threshold</strong></td><td class="uiuc-col">Program-specific review.</td><td class="uic-col">Minimum <strong>3.0 GPA</strong> in final 60 undergraduate hours and graduate work; recent research and statistics coursework expected.</td><td class="iowa-col">Holistic doctoral admissions review.</td></tr>
+<tr><td><strong>Study model</strong></td><td class="uiuc-col">Full-time research doctorate with broad campus research access.</td><td class="uic-col"><strong>Full-time or part-time.</strong> Two broad tracks: social planning/policy/administration and social-work practice scholarship. Interdisciplinary electives may be taken across UIC and UIUC, plus Chicago Metropolitan Exchange opportunities.</td><td class="iowa-col">4- or 5-year in-person PhD with interdisciplinary concentration options.</td></tr>
+<tr><td><strong>Funding</strong></td><td class="uiuc-col">Assistantships/funding available; package must be confirmed with the School.</td><td class="uic-col"><strong>Top fellowships: about $30,000/year for four years + tuition waiver.</strong> Also college RAs, faculty-grant RAs, teaching assistantships, and tuition waivers.</td><td class="iowa-col">Published assistantship support can include stipend, tuition coverage, and health insurance when offered.</td></tr>
+</tbody></table></div></section>
 
-<section id="admissions">
-  <h2>Admissions + structure</h2>
-  <p class="lead">The key eligibility question is settled: an MSW is a standard entry route at both schools. The deadline situation is different.</p>
-  <div style="overflow:auto">
-  <table class="compare">
-    <thead><tr><th>Question</th><th>Illinois</th><th>Iowa</th></tr></thead>
-    <tbody>
-      <tr><td><strong>MSW → PhD?</strong></td><td class="uill"><span class="check">Yes.</span> Illinois' PhD is a post-master's doctoral program; the School also maintains a separate Joint MSW/PhD route for people entering from other master's fields.</td><td class="uiowa"><span class="check">Yes.</span> Iowa states that students entering with an MSW receive 30 semester hours toward the 78-hour doctorate and complete 48 additional hours.</td></tr>
-      <tr><td><strong>Fall 2027 deadline</strong></td><td class="uill"><span class="caution">Direct-PhD 2027 dates not yet posted on the current direct-admissions page.</span> As of Oct. 6, the page still displays the prior cycle's Dec. 1 priority / Jan. 15 final dates. Treat Dec. 1 as the internal target until Illinois posts the new cycle.</td><td class="uiowa"><strong>Feb. 1, 2027.</strong> Iowa says Fall 2027 applicants who meet the deadline receive decisions no later than March 31, 2027.</td></tr>
-      <tr><td><strong>Application elements</strong></td><td class="uill">Graduate application, personal statement, illustrative writing sample, résumé, 3 references, transcripts.</td><td class="uiowa">Graduate application plus program materials including PhD goals and research-question essays and the department supplemental form.</td></tr>
-      <tr><td><strong>Program model</strong></td><td class="uill">Research doctorate with qualifying paper, dissertation, teaching opportunities, and broad Illinois campus access.</td><td class="uiowa">4- or 5-year in-person PhD in Iowa City; research + teaching practicums; outside concentration in sociology, psychology, public health, or education.</td></tr>
-      <tr><td><strong>Funding clarity</strong></td><td class="uill">Illinois publishes PhD scholarships and doctoral funding evidence, but the public admissions page is less explicit about a universal package. <strong>Confirm package directly.</strong></td><td class="uiowa">Iowa explicitly says that, when funds are available, full-time PhD admits receive priority for assistantships that include tuition coverage, stipend, and health insurance.</td></tr>
-    </tbody>
-  </table>
-  </div>
-</section>
+<section id="research"><h2>Research fit</h2><p class="lead">The emerging through-line is not one topic. It is a recurring question about what happens when systems offer a solution but leave structural gaps around the people expected to use it.</p><div class="grid four">
+<div class="card research uiuc"><strong>Financial vulnerability + life insurance</strong><p>Economic precarity, intergenerational vulnerability, financial capability, ethics, and whether products marketed as protection actually improve long-term household security.</p></div>
+<div class="card research uic"><strong>Social + economic justice</strong><p>Jane Addams is especially strong as a home for research that frames financial vulnerability, service access, and institutional design as social-justice and policy questions.</p></div>
+<div class="card research iowa"><strong>AI + human services</strong><p>Digital mental-health tools, ethical AI, intervention design, accessibility, and evaluation of technology used with vulnerable populations.</p></div>
+<div class="card research uiuc"><strong>Bariatric aftermath + continuity of care</strong><p>Post-operative guidance, long-term psychosocial adjustment, quality of follow-up, informal advice ecosystems, and gaps between surgery and sustained support.</p></div>
+</div></section>
 
-<section id="research">
-  <h2>Winston's emerging research portfolio</h2>
-  <p class="lead">You do not need one dissertation topic today. You need a coherent intellectual territory. These questions already cluster around access, vulnerability, technology, intervention quality, and what happens when systems give people incomplete support.</p>
-  <div class="grid four">
-    <article class="card research-card"><strong>Financial vulnerability + life insurance</strong><p>How do financial-service and insurance systems operate in communities where intergenerational economic insecurity is persistent? What distinguishes protection from extraction?</p></article>
-    <article class="card research-card"><strong>Post-bariatric life after surgery</strong><p>What happens after the procedure, especially when patients receive inconsistent nutrition, behavioral-health, or long-term support? Who is giving guidance, and what outcomes follow?</p></article>
-    <article class="card research-card"><strong>Digital mental health + Skybound</strong><p>Can interactive narrative tools translate CBT concepts into accessible practice while protecting privacy, avoiding overclaiming, and improving engagement?</p></article>
-    <article class="card research-card"><strong>Program evaluation + community systems</strong><p>Which services actually produce lasting changes in daily life, not just short-term program outputs? How can participant experience change what programs measure?</p></article>
-  </div>
-</section>
+<section id="matrix"><h2>Decision matrix</h2><p class="lead">These are planning scores, not admissions probabilities. They measure fit with Winston's current situation in October 2026.</p><div class="matrix">
+<div class="head">Factor</div><div class="head score">UIUC</div><div class="head score">UIC</div><div class="head score">Iowa</div>
+<div>Existing faculty relationships / visibility</div><div class="score">10</div><div class="score">5</div><div class="score">4</div>
+<div>Research fit with emerging questions</div><div class="score">9</div><div class="score">9</div><div class="score">9</div>
+<div>Social/economic justice mission fit</div><div class="score">9</div><div class="score">10</div><div class="score">8</div>
+<div>AI / digital intervention potential</div><div class="score">10</div><div class="score">7</div><div class="score">10</div>
+<div>Funding clarity / upside</div><div class="score">8</div><div class="score">10</div><div class="score">9</div>
+<div>Ability to build evidence before applying</div><div class="score">10</div><div class="score">6</div><div class="score">6</div>
+<div>Interdisciplinary access</div><div class="score">9</div><div class="score">10</div><div class="score">9</div>
+<div>Current overall strategic score</div><div class="score"><strong>91</strong></div><div class="score"><strong>87</strong></div><div class="score"><strong>82</strong></div>
+</div></section>
 
-<section id="faculty">
-  <h2>Faculty and research fit</h2>
-  <p class="lead">These are not proposed dissertation chairs. They are current evidence that each university contains research ecosystems relevant to the questions Winston is already asking.</p>
-  <div class="grid two">
-    <article class="card" style="border-top:7px solid var(--illinois-orange)">
-      <div class="eyebrow" style="color:var(--illinois-orange)">Illinois</div>
-      <h3>Dr. Moses Okumu is an unusually direct bridge</h3>
-      <p>Illinois describes Okumu's work as developing, implementing, and evaluating interventions in marginalized communities, including <strong>digital and technology-based interventions</strong> for mental and sexual health. Current Illinois research listings also include his project on <strong>reducing trafficking through financial capability</strong>.</p>
-      <p>Washington University's Center for Social Development identifies him as a faculty director in <strong>Financial Capability and Asset Building in Africa</strong>. He earned his MSW from Washington University's Brown School.</p>
-      <p><span class="badge good">Digital intervention</span><span class="badge good">Mental health</span><span class="badge good">Financial capability</span><span class="badge good">Evaluation</span></p>
-    </article>
-    <article class="card" style="border-top:7px solid var(--iowa-gold)">
-      <div class="eyebrow" style="color:#8A6500">Iowa</div>
-      <h3>Iowa has a real AI + economic-hardship lane</h3>
-      <p><strong>Dr. Aislinn Conrad</strong> is described by Iowa as researching child abuse prevention, <strong>economic hardship</strong>, and the <strong>ethical integration of AI in social systems</strong>, including community-engaged evaluation work.</p>
-      <p>Iowa also reports current work involving assistant professor <strong>Haelim Jeong</strong> on loneliness, sleep disruption, and the use of <strong>AI chatbots such as ChatGPT for mental-health support</strong>.</p>
-      <p><span class="badge good">AI ethics</span><span class="badge good">Economic hardship</span><span class="badge good">Mental health</span><span class="badge good">Evaluation</span></p>
-    </article>
-  </div>
-  <div class="grid two" style="margin-top:18px">
-    <article class="card"><h3>Illinois ecosystem advantage</h3><p>You are physically present in the School now. You can take research methods courses, attend talks, ask about RA work, develop an independent study, obtain a faculty-supervised product, and turn ordinary MSW contact into evidence of doctoral readiness.</p></article>
-    <article class="card"><h3>Iowa interdisciplinary advantage</h3><p>Iowa explicitly builds an outside concentration into the PhD. Sociology, psychology, public health, or education could give you a second methodological/intellectual home depending on where the research portfolio consolidates.</p></article>
-  </div>
-</section>
+<section id="timeline"><h2>Application plan</h2><div class="timeline">
+<div class="step"><h3>October 2026 · Turn interest into evidence</h3><p>Follow up on the Illinois PhD-pipeline conversation. Identify one realistic research-assistant, faculty-project, evaluation, conference, or Skybound research-development opportunity.</p></div>
+<div class="step"><h3>October–November · Build three faculty-fit maps</h3><p>Identify 2–4 faculty at UIUC, UIC, and Iowa whose current work could plausibly support the research questions. Do not write essays around school reputation; write them around mentorship and research environment.</p></div>
+<div class="step"><h3>November · Convert coursework into a writing sample</h3><p>Choose the strongest research/evaluation paper and revise it beyond the class requirement so it reads like evidence of doctoral potential.</p></div>
+<div class="step"><h3>By December 1 · Illinois-ready</h3><p>Have the Illinois packet essentially finished even if the official Fall 2027 deadline is later.</p></div>
+<div class="step"><h3>By December 15 · UIC early deadline</h3><p>Submit Jane Addams by the early deadline to preserve eligibility for University Fellowship nomination.</p></div>
+<div class="step"><h3>By February 1 · Iowa</h3><p>Submit Iowa after incorporating what was learned from the Illinois and UIC applications.</p></div>
+<div class="step"><h3>Spring 2027 · Compare offers, mentors, and money</h3><p>Do not choose based on school name. Compare guaranteed funding, mentor availability, RA opportunities, dissertation fit, family logistics, and what each program would let Winston build.</p></div>
+</div></section>
 
-<section>
-  <h2>What Illinois has that cannot be copied on an application</h2>
-  <div class="grid three">
-    <article class="card"><h3>1. Faculty observation</h3><p>Okumu has seen how you reason in his classroom, not just how you describe yourself in a personal statement. That can become meaningful only if you keep showing the work.</p></article>
-    <article class="card"><h3>2. A live research bridge</h3><p>Your questions about vulnerable populations, financial capability, digital intervention, and evaluation now overlap his actual research portfolio. There is a natural reason to continue the conversation.</p></article>
-    <article class="card"><h3>3. Skybound is concrete</h3><p>Instead of saying “I'm interested in AI and mental health,” you can show a functioning intervention prototype and ask researchable questions about engagement, ethics, accessibility, CBT fidelity, and outcomes.</p></article>
-  </div>
-</section>
+<section id="michelle"><div class="verdict"><div class="rank">Current recommendation</div><h2>Apply to all three. Build toward Illinois first. Take UIC very seriously.</h2><p><strong>Illinois</strong> still leads because Winston already has access to faculty who can watch him develop and because the PhD conversation has begun organically. <strong>UIC Jane Addams</strong> is now the strongest external challenger: its mission aligns directly with the structural justice questions Winston keeps returning to, it has a clear December 15 early deadline, and its best fellowships can include four years of roughly $30,000 annual support plus tuition. <strong>Iowa</strong> remains a strong third application because its interdisciplinary and AI/economic-hardship fit is distinctive.</p><p>The smartest move is not to decide now. The smartest move is to create three strong applications and let admissions, mentor fit, and guaranteed funding create the real decision in spring.</p></div></section>
 
-<section id="matrix">
-  <h2>Decision matrix</h2>
-  <p class="lead">The weighting favors what will make a Fall 2027 application successful, not prestige for its own sake.</p>
-  <div class="matrix">
-    <div class="head">Factor</div><div class="head score">Weight</div><div class="head score">Illinois</div><div class="head score whycol">Iowa</div>
-    <div><strong>Research / faculty fit</strong><div class="why">Does the program contain people already doing adjacent work?</div></div><div class="score">30%</div><div class="score">9.5</div><div class="score whycol">9.0</div>
-    <div><strong>Existing access + mentorship</strong><div class="why">Can Winston build research evidence before applying?</div></div><div class="score">25%</div><div class="score">10</div><div class="score whycol">5.5</div>
-    <div><strong>Funding clarity</strong><div class="why">How explicit is the published support structure?</div></div><div class="score">20%</div><div class="score">7.5</div><div class="score whycol">9.5</div>
-    <div><strong>Interdisciplinary flexibility</strong><div class="why">Ability to pull methods/theory from outside social work.</div></div><div class="score">15%</div><div class="score">9.0</div><div class="score whycol">10</div>
-    <div><strong>Family / relocation friction</strong><div class="why">Practical cost of changing cities while children are still at home.</div></div><div class="score">10%</div><div class="score">10</div><div class="score whycol">5</div>
-    <div class="head">Weighted result</div><div class="head score">100%</div><div class="head score">91/100</div><div class="head score whycol">82/100</div>
-  </div>
-  <p class="note">Scores are decision-support judgments, not university rankings.</p>
-</section>
-
-<section>
-  <h2>Where each school currently wins</h2>
-  <div class="grid two">
-    <article class="card">
-      <div class="metric"><span>Faculty access now</span><span>Illinois</span></div><div class="bar"><div class="fill il" style="width:98%"></div></div>
-      <div class="metric"><span>Immediate Skybound pathway</span><span>Illinois</span></div><div class="bar"><div class="fill il" style="width:95%"></div></div>
-      <div class="metric"><span>Low-disruption transition</span><span>Illinois</span></div><div class="bar"><div class="fill il" style="width:98%"></div></div>
-    </article>
-    <article class="card">
-      <div class="metric"><span>Published funding clarity</span><span>Iowa</span></div><div class="bar"><div class="fill ia" style="width:95%"></div></div>
-      <div class="metric"><span>Formal outside-discipline structure</span><span>Iowa</span></div><div class="bar"><div class="fill ia" style="width:98%"></div></div>
-      <div class="metric"><span>Explicit AI + economic-hardship faculty fit</span><span>Iowa</span></div><div class="bar"><div class="fill ia" style="width:93%"></div></div>
-    </article>
-  </div>
-</section>
-
-<section id="timeline">
-  <h2>October 2026 → Fall 2027</h2>
-  <p class="lead">The strongest move is not “apply to a PhD.” It is to use the next three months to produce evidence that you belong in research.</p>
-  <div class="card timeline">
-    <div class="step"><h3>Now · October 2026</h3><p>Follow up with Dr. Okumu while today's conversation is fresh. Ask what the PhD pipeline looks like in practical terms and what research activity he would advise you to pursue this semester.</p></div>
-    <div class="step"><h3>October–November</h3><p>Choose one small research-development action: RA involvement, an independent-study conversation, a literature map, a Skybound evaluation concept, or a faculty-guided research question. The goal is mentorship + evidence, not a dissertation topic.</p></div>
-    <div class="step"><h3>By mid-November</h3><p>Identify 3 recommenders. At least one should be able to discuss research thinking, methodological growth, and doctoral potential rather than simply course performance.</p></div>
-    <div class="step"><h3>Before December 1</h3><p>Have the Illinois packet functionally complete even if the School has not yet posted the new direct-PhD deadline. Draft the statement around an intellectual trajectory, not a list of unrelated passions.</p></div>
-    <div class="step"><h3>December–January</h3><p>Build the Iowa version around a focused research question. Make direct contact with 1–2 faculty whose work genuinely overlaps the proposed agenda.</p></div>
-    <div class="step"><h3>February 1, 2027</h3><p>Iowa final application deadline for Fall 2027.</p></div>
-    <div class="step"><h3>Spring 2027</h3><p>Compare actual offers, faculty mentorship, assistantship details, health insurance, tuition waiver terms, workload, and family logistics. Do not choose from websites once real packages exist.</p></div>
-  </div>
-</section>
-
-<section>
-  <h2>Research narrative that could hold the application together</h2>
-  <div class="callout">
-    <p class="quote" style="font-size:1.55rem">I am interested in what happens when institutions offer people a solution, but the structure around that solution is incomplete.</p>
-    <p>That frame can legitimately connect several experiences without pretending they are already one dissertation: families purchasing financial protection while remaining economically vulnerable; bariatric patients receiving a life-changing intervention without consistent long-term guidance; digital mental-health tools that can widen access but require rigorous ethical evaluation; and community programs whose success should be judged by what people can actually carry into daily life after the program ends.</p>
-    <p><strong>The common question:</strong> How can social work design, evaluate, and improve interventions so that access to a service becomes durable capability rather than a temporary transaction?</p>
-  </div>
-</section>
-
-<section id="michelle">
-  <div class="verdict">
-    <div class="rank">Current recommendation · October 6, 2026</div>
-    <h2>Apply to both. Build toward Illinois first.</h2>
-    <p><strong>Illinois is the #1 target right now</strong> because the most valuable advantage is already happening: faculty are seeing Winston's thinking in real time, one professor independently raised the PhD pipeline, and that professor's actual research portfolio intersects with several of Winston's questions.</p>
-    <p><strong>Iowa is not a backup in the weak sense.</strong> It is a strong second application with clearer published funding language and excellent alignment around AI, economic hardship, mental health, evaluation, and interdisciplinary study. If Iowa produces a stronger mentor match or funding package, it deserves serious consideration.</p>
-    <p>For Michelle: the decision does not need to be made now. The immediate decision is simply whether Winston should use this MSW year to test doctoral potential and submit two strong applications. On the evidence available today, <strong>yes</strong>.</p>
-  </div>
-</section>
-
-<section class="sources">
-  <h2>Sources + verification</h2>
-  <p class="lead">Program facts below were checked against university sources on October 6, 2026. Personal conversation details come from Winston's account and are intentionally described as context rather than institutional commitments.</p>
-  <ol class="source-list">
-    <li><a href="https://courses.illinois.edu/schedule/2026/fall/SOCW/542" target="_blank" rel="noopener">Illinois Course Explorer: SOCW 542 Fall 2026</a> — lists Moses Okumu as instructor for the in-person section.</li>
-    <li><a href="https://socialwork.illinois.edu/admissions-academics/graduate-programs/phd-in-social-work/phd-admissions/" target="_blank" rel="noopener">Illinois PhD Admissions</a> — application requirements; as checked, direct-PhD deadline display had not yet been updated for Fall 2027.</li>
-    <li><a href="https://socialwork.illinois.edu/research/global-health-innovation-collaborative/" target="_blank" rel="noopener">Illinois Global Health Innovation Collaborative</a> — Okumu's digital-intervention and mental-health research.</li>
-    <li><a href="https://socialwork.illinois.edu/research/research-office/faculty-research-grants/" target="_blank" rel="noopener">Illinois Active Research and Grants</a> — financial-capability project listing.</li>
-    <li><a href="https://csd.wustl.edu/people/moses-okumu/" target="_blank" rel="noopener">Washington University Center for Social Development: Moses Okumu</a> — financial capability and asset building.</li>
-    <li><a href="https://socialwork.uiowa.edu/graduate/phd-social-work" target="_blank" rel="noopener">Iowa PhD in Social Work</a> — MSW credit, structure, duration, interdisciplinary concentration, and funding FAQ.</li>
-    <li><a href="https://socialwork.uiowa.edu/graduate/phd-social-work/admissions" target="_blank" rel="noopener">Iowa PhD Admissions</a> — Fall 2027 deadline and application materials.</li>
-    <li><a href="https://socialwork.uiowa.edu/people/aislinn-conrad" target="_blank" rel="noopener">Iowa: Aislinn Conrad</a> — AI, economic hardship, and evaluation research.</li>
-    <li><a href="https://socialwork.uiowa.edu/news/2026/01" target="_blank" rel="noopener">Iowa School of Social Work news, Jan. 2026</a> — AI chatbot / mental-health research collaboration.</li>
-  </ol>
-</section>
-
+<section class="sources"><h2>Official sources</h2><ul class="source-list">
+<li><a href="https://socialwork.illinois.edu/admissions-academics/graduate-programs/phd-in-social-work/" target="_blank" rel="noopener">UIUC Social Work PhD</a></li>
+<li><a href="https://socialwork.uic.edu/academics/phd-in-social-work/" target="_blank" rel="noopener">UIC Jane Addams PhD overview</a></li>
+<li><a href="https://socialwork.uic.edu/academics/phd-in-social-work/apply-to-phd/" target="_blank" rel="noopener">UIC PhD application + deadlines</a></li>
+<li><a href="https://socialwork.uic.edu/academics/phd-in-social-work/phd-program-requirements/" target="_blank" rel="noopener">UIC PhD admission requirements</a></li>
+<li><a href="https://socialwork.uic.edu/academics/phd-in-social-work/phd-financial-aid-information/" target="_blank" rel="noopener">UIC PhD funding</a></li>
+<li><a href="https://socialwork.uic.edu/academics/phd-in-social-work/phd-program-plan-of-study/" target="_blank" rel="noopener">UIC PhD plan of study</a></li>
+<li><a href="https://socialwork.uiowa.edu/graduate/phd-social-work" target="_blank" rel="noopener">Iowa Social Work PhD</a></li>
+</ul><p class="note">Last updated October 9, 2026. Scores are personal planning judgments based on current fit, not predictions of admission.</p></section>
 </main>
-<footer class="footer"><strong>PhD Decision Desk</strong> · Built as a living planning page for W Winston Scott · Illinois orange/navy × Iowa gold/black</footer>
+<footer class="footer"><strong>PhD Decision Desk</strong> · W Winston Scott · Illinois orange/navy × UIC red/blue × Iowa gold/black</footer>
 </body>
 </html>
