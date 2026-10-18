@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#243448">
+<meta name="description" content="Michelle's Funding Finder — grants, scholarships, real estate funding and business capital in one organized place.">
+<title>Michelle's Funding Finder</title>
+<style>
+:root{--ink:#23344a;--muted:#607080;--pale:#f7f7f4;--white:#fff;--teal:#176c68;--lav:#eae6fa;--rose:#faece8;--line:#e1e7e5;--gold:#bd8750;--shadow:0 9px 30px rgba(30,50,70,.07)}
+*{box-sizing:border-box}
+body{margin:0;color:var(--ink);background:var(--pale);font:15px/1.45 system-ui,-apple-system,Segoe UI,sans-serif}
+button,input,select,textarea{font:inherit}a{color:inherit}
+button{cursor:pointer}
+header{background:#243448;color:white;padding:18px clamp(18px,5vw,70px);display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.wordmark{font:italic 27px Georgia,serif;letter-spacing:-.5px}.wordmark small{display:block;font:500 10px system-ui,sans-serif;letter-spacing:2px;text-transform:uppercase;color:#c7d8da;margin-top:1px}
+.pill{display:inline-flex;align-items:center;gap:6px;border-radius:999px;font-size:12px;font-weight:750;padding:7px 12px;background:#eaf3f0;color:#176c68}
+header .pill{background:#39556a;color:#dbf4eb}
+.container{max-width:1200px;margin:auto;padding:0 22px 72px}
+.hero{position:relative;overflow:hidden;margin:27px 0 19px;border-radius:23px;background:#e8edea;min-height:250px;padding:38px 42px;display:flex;align-items:center;box-shadow:var(--shadow)}
+.hero:after{content:"";position:absolute;right:-45px;top:-100px;width:470px;height:470px;border-radius:50%;background:radial-gradient(circle at 36% 43%,#fff9df 0 21%,#d1e5de 22% 37%,#b6d1ce 38% 55%,#e8edea 56%);opacity:.9}
+.hero:before{content:"✦";position:absolute;font-size:140px;right:210px;bottom:-65px;z-index:1;color:#d3a983;opacity:.7}
+.hero>div{z-index:2;max-width:660px}
+.eyebrow{color:var(--teal);font-weight:850;font-size:11px;letter-spacing:2.2px;text-transform:uppercase}
+h1,h2,h3{margin:0;line-height:1.1}h1{font:normal clamp(34px,5.4vw,62px)/1.02 Georgia,serif;letter-spacing:-2px;margin:11px 0 13px}h1 em{font-weight:normal;color:var(--teal)}
+.hero p{margin:0;color:#4c626b;max-width:550px;font-size:16px}
+.hero-actions{margin-top:22px;display:flex;gap:9px;flex-wrap:wrap}
+.btn{border:1px solid #d1dbd9;background:white;color:var(--ink);border-radius:11px;padding:11px 15px;font-weight:720;display:inline-flex;gap:8px;align-items:center;justify-content:center;text-decoration:none;transition:transform .15s,box-shadow .15s}
+.btn:hover{transform:translateY(-1px);box-shadow:0 3px 12px #20304018}.btn.primary{background:var(--teal);color:white;border-color:var(--teal)}.btn.dark{background:var(--ink);color:white;border-color:var(--ink)}
+.btn.small{padding:8px 10px;font-size:12px;border-radius:9px}.btn.ghost{background:transparent}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:17px 0 25px}
+.stat{background:white;border:1px solid var(--line);border-radius:15px;padding:16px 19px}.stat strong{display:block;font:normal 29px Georgia,serif}.stat span{font-size:12px;color:var(--muted);font-weight:650}
+.tabbar{display:flex;align-items:center;gap:5px;border-bottom:1px solid var(--line);margin:25px 0 20px;overflow:auto}
+.tab{border:0;background:transparent;color:#63727c;padding:12px 17px;font-weight:730;white-space:nowrap;border-bottom:3px solid transparent}
+.tab.active{border-color:var(--teal);color:var(--teal)}
+.toolbar{background:white;border:1px solid var(--line);border-radius:15px;padding:15px;display:grid;grid-template-columns:minmax(180px,2fr) repeat(3,minmax(125px,1fr));gap:10px;margin-bottom:15px}
+input,select,textarea{width:100%;padding:11px 12px;border:1px solid #d5dfdd;border-radius:10px;background:#fff;color:var(--ink);outline-color:var(--teal);min-width:0}
+label{display:block;font-size:12px;color:var(--muted);font-weight:760;margin-bottom:6px}
+.section-head{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:24px 0 14px}
+h2{font:normal 28px Georgia,serif}.sub{color:var(--muted);font-size:13px;margin:5px 0 0}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.card{background:#fff;border:1px solid var(--line);border-radius:17px;box-shadow:var(--shadow);padding:21px;display:flex;flex-direction:column;gap:13px;min-width:0}
+.card-top{display:flex;justify-content:space-between;gap:12px;align-items:start}.tagrow{display:flex;flex-wrap:wrap;gap:6px}
+.tag{font-size:10px;letter-spacing:.2px;font-weight:850;border-radius:20px;padding:5px 9px;background:#f0f2f6;color:#516176;text-transform:uppercase}
+.tag.women{background:#f8e5ec;color:#864b69}.tag.real{background:#e8e2fa;color:#65578e}.tag.business{background:#e6f3ed;color:#246c56}.tag.edu{background:#fff1d9;color:#896223}
+.heart{font-size:22px;border:0;background:#f4f7f5;border-radius:11px;width:38px;height:38px;flex:none;color:#99a6ab}
+.heart.saved{background:#fbe8e6;color:#ad4f57}
+.card h3{font:normal 24px/1.15 Georgia,serif}.org{color:var(--muted);font-size:12px;font-weight:700;margin-top:4px}
+.details{font-size:13px;color:#4d5d68;margin:0;min-height:37px}
+.meta{display:grid;grid-template-columns:1fr 1fr;gap:10px;background:#f7f8f7;border-radius:11px;padding:12px}
+.meta .k{font-size:10px;letter-spacing:.6px;font-weight:800;text-transform:uppercase;color:#70818a}.meta .v{display:block;font-size:13px;font-weight:780;margin-top:4px}
+.v.over{color:#b45b57}.v.soon{color:#a3691f}.v.good{color:#137663}
+.eligibility{font-size:12px;color:#667786;border-left:3px solid #dce7e1;padding-left:10px}
+.card-bottom{margin-top:auto;border-top:1px solid var(--line);padding-top:13px;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.card-bottom .btn{flex:1}.stage{font-size:12px;width:auto;max-width:155px;padding:8px 5px}
+.note{border-radius:9px;background:#fff8e9;color:#78613a;padding:9px 11px;font-size:12px}
+.notice{border:1px solid #e7dcc6;background:#fff9ea;color:#716047;border-radius:11px;padding:12px 15px;font-size:12px;margin:12px 0 17px}
+.empty{border:1px dashed #c4d4d0;background:white;border-radius:15px;padding:34px;text-align:center;color:var(--muted)}
+.sources{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.source{background:white;border:1px solid var(--line);border-radius:15px;padding:19px;min-height:154px;display:flex;flex-direction:column;justify-content:space-between;text-decoration:none}
+.source strong{font:normal 21px Georgia,serif}.source p{font-size:12px;color:var(--muted)}.arrow{color:var(--teal);font-weight:850}
+.tools{display:flex;gap:9px;flex-wrap:wrap;margin:14px 0 20px}.tools .btn{font-size:12px}
+footer{border-top:1px solid var(--line);margin-top:35px;padding:24px 0;color:#728087;font-size:12px}
+dialog{border:0;border-radius:19px;max-width:600px;width:calc(100% - 26px);box-shadow:0 25px 100px #14243455;padding:24px;color:var(--ink)}dialog::backdrop{background:#1c2d40a1}
+.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px} .span2{grid-column:1/-1}
+.form-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:16px}
+.count{font-size:12px;color:var(--muted)}
+@media(max-width:780px){.hero{padding:27px;min-height:250px}.hero:after{right:-270px}.hero:before{right:65px}.stats{grid-template-columns:repeat(2,1fr)}.toolbar{grid-template-columns:1fr 1fr}.toolbar #search{grid-column:1/-1}.grid{grid-template-columns:1fr}.sources{grid-template-columns:1fr 1fr}}
+@media(max-width:480px){.container{padding:0 14px 50px}.hero{padding:27px 22px;min-height:290px;margin-top:15px}.hero:after{opacity:.24}.wordmark{font-size:23px}.stats{gap:8px}.stat{padding:13px}.tab{padding:11px 12px}.toolbar{padding:10px;gap:7px}.sources{grid-template-columns:1fr}.formgrid{grid-template-columns:1fr}.span2{grid-column:1}.card{padding:17px}.card-bottom .btn{flex:unset}}
+</style>
+</head>
+<body>
+<header>
+  <div class="wordmark">Michelle's Funding Finder<small>Opportunity & application desk</small></div>
+  <span class="pill">✦ Business · Women · Real Estate</span>
+</header>
+<main class="container">
+<section class="hero">
+  <div><div class="eyebrow">Less searching. More opportunity.</div><h1>Find the funding.<br><em>Make the move.</em></h1>
+  <p>One place to explore funding, keep your favorites, plan applications, and never lose sight of a deadline.</p>
+  <div class="hero-actions"><button class="btn primary" id="newTop">+ Add an opportunity</button><a class="btn" href="#sources" id="sourceTop">Explore funding sources ↗</a></div></div>
+</section>
+<div class="stats">
+<div class="stat"><strong id="countAll">0</strong><span>Leads in the desk</span></div>
+<div class="stat"><strong id="countSaved">0</strong><span>Saved opportunities</span></div>
+<div class="stat"><strong id="countSoon">0</strong><span>Deadlines in 30 days</span></div>
+<div class="stat"><strong id="countActive">0</strong><span>In progress</span></div>
+</div>
+<div class="tabbar" role="tablist" aria-label="Sections">
+<button class="tab active" data-tab="discover">Explore opportunities</button>
+<button class="tab" data-tab="pipeline">My funding pipeline</button>
+<button class="tab" data-tab="sources">Find new funding</button>
+</div>
+<section id="discoverView">
+<div class="toolbar">
+<input id="search" type="search" placeholder="Search by name, organization, keywords…" aria-label="Search opportunities">
+<select id="category" aria-label="Filter focus"><option value="">All focus areas</option><option>Women-owned business</option><option>Small business</option><option>Real estate</option><option>Business education</option></select>
+<select id="kind" aria-label="Filter funding type"><option value="">All funding types</option><option>Grant</option><option>Scholarship</option><option>Loan</option><option>Funding directory</option></select>
+<select id="sort" aria-label="Sort opportunities"><option value="priority">Recommended first</option><option value="deadline">Soonest deadline</option><option value="name">Name A–Z</option></select>
+</div>
+<div class="notice"><strong>Research snapshot: October 18, 2026.</strong> Starter leads link to their original providers. Deadlines, amounts and eligibility can change. “Watch” does not mean applications are open. This page does not automatically fetch new listings.</div>
+<div class="section-head"><div><h2>Funding opportunities</h2><p class="sub">Grants, scholarships, lending and places to search. Every category is labeled.</p></div><span class="count" id="resultCount"></span></div>
+<div class="grid" id="discoverGrid"></div>
+</section>
+<section id="pipelineView" hidden>
+<div class="section-head"><div><h2>My funding pipeline</h2><p class="sub">Save an opportunity with ♡, then set its application stage and add notes.</p></div><button class="btn small primary" id="newPipeline">+ Add lead</button></div>
+<div class="tools"><button class="btn" id="exportCSV">↓ Export spreadsheet (CSV)</button><button class="btn" id="exportICS">↓ Deadline calendar (.ics)</button><button class="btn" id="exportJSON">↓ Back up my tracker</button><label class="btn" style="cursor:pointer;margin:0">↑ Restore backup<input type="file" accept="application/json,.json" id="importJSON" hidden></label></div>
+<div class="notice">Your saved leads, notes and application stages live <strong>only in this browser on this device</strong>. Download a backup if you switch devices or clear browser storage. Nothing you enter is published to GitHub.</div>
+<div class="grid" id="pipelineGrid"></div>
+</section>
+<section id="sourcesView" hidden>
+<div class="section-head"><div><h2>New leads start here</h2><p class="sub">Browse trusted organizers and official funding directories. Select a lead and add it to the tracker.</p></div><button class="btn small primary" id="newSources">+ Add a lead</button></div>
+<div class="sources">
+<a class="source" target="_blank" rel="noopener" href="https://ambergrantsforwomen.com/all-grants/"><div><strong>WomensNet / Amber Grants</strong><p>Monthly programs for women-owned businesses, including startup-stage companies.</p></div><span class="arrow">Open official site ↗</span></a>
+<a class="source" target="_blank" rel="noopener" href="https://dceo.illinois.gov/dceo-grants.html"><div><strong>Illinois DCEO</strong><p>Current Illinois grant notices, capital grant programs, technical assistance and alerts.</p></div><span class="arrow">Explore state grants ↗</span></a>
+<a class="source" target="_blank" rel="noopener" href="https://www.grants.gov/search-grants"><div><strong>Grants.gov</strong><p>Federal funding opportunities. Check applicant type carefully; not every grant funds private businesses.</p></div><span class="arrow">Search federal grants ↗</span></a>
+<a class="source" target="_blank" rel="noopener" href="https://www.ilreef.org/scholarships/"><div><strong>Illinois REEF scholarships</strong><p>Education, pre-licensing, business, and real estate career scholarships.</p></div><span class="arrow">Find a scholarship ↗</span></a>
+<a class="source" target="_blank" rel="noopener" href="https://crewnetwork.org/crew-network-foundation/college-scholarships"><div><strong>CREW Network</strong><p>Scholarships and career support for women studying commercial real estate.</p></div><span class="arrow">See next cycle ↗</span></a>
+<a class="source" target="_blank" rel="noopener" href="https://www.sba.gov/funding-programs"><div><strong>U.S. Small Business Administration</strong><p>Compare lending, investment and targeted support; ordinary startup costs are not generally SBA grant-funded.</p></div><span class="arrow">Compare funding ↗</span></a>
+<a class="source" target="_blank" rel="noopener" href="https://goldieinitiative.org/scholar-program/scholar-program-overview/application/"><div><strong>The Goldie Initiative</strong><p>Graduate scholarships and mentorship for women pursuing commercial real estate leadership.</p></div><span class="arrow">Join next-cycle updates ↗</span></a>
+<a class="source" target="_blank" rel="noopener" href="https://www.ihda.org/my-community/revitalization-programs/"><div><strong>Illinois Housing Development Authority</strong><p>Housing preservation, home repair and community revitalization programs with specific eligibility.</p></div><span class="arrow">Explore housing programs ↗</span></a>
+<a class="source" target="_blank" rel="noopener" href="https://dceo.illinois.gov/oe3.html"><div><strong>Illinois equity-focused business support</strong><p>Statewide resources and notifications for women-owned and underserved businesses.</p></div><span class="arrow">Check announcements ↗</span></a>
+</div>
+<div class="notice" style="margin-top:18px"><strong>Funding safety:</strong> A loan is not a grant. Be wary of “guaranteed approval,” high-pressure fees, and unsolicited award notices. Verify each offer on the sponsoring organization’s own website.</div>
+</section>
+<footer>Made for Michelle ✦ Illinois-focused, nationwide opportunities included. Updated starter research: Oct 18, 2026. Site entries are informational, not eligibility determinations or financial advice.</footer>
+</main>
+<dialog id="leadDialog"><form id="leadForm"><div class="section-head" style="margin:0 0 16px"><div><h2 id="dialogTitle">Add an opportunity</h2><p class="sub">Keep the official link and any deadline you know.</p></div><button type="button" class="btn small" id="closeDialog">✕</button></div>
+<div class="formgrid">
+<div class="span2"><label for="fName">Opportunity name *</label><input id="fName" required maxlength="120"></div>
+<div><label for="fOrg">Organization</label><input id="fOrg" maxlength="90"></div>
+<div><label for="fAmount">Funding amount</label><input id="fAmount" placeholder="e.g., $5,000 or varies" maxlength="80"></div>
+<div><label for="fKind">Funding type</label><select id="fKind"><option>Grant</option><option>Scholarship</option><option>Loan</option><option>Funding directory</option></select></div>
+<div><label for="fCat">Focus area</label><select id="fCat"><option>Women-owned business</option><option>Small business</option><option>Real estate</option><option>Business education</option></select></div>
+<div><label for="fDeadline">Known deadline</label><input id="fDeadline" type="date"></div>
+<div><label for="fAvail">Application availability</label><select id="fAvail"><option>Open</option><option>Rolling</option><option>Watch</option><option>Closed</option><option>Resource</option></select></div>
+<div class="span2"><label for="fUrl">Official funding link</label><input id="fUrl" type="url" placeholder="https://..."></div>
+<div class="span2"><label for="fDesc">Description / eligibility</label><textarea id="fDesc" rows="3"></textarea></div>
+</div><div class="form-actions"><button type="button" class="btn" id="cancelDialog">Cancel</button><button type="submit" class="btn primary">Save opportunity</button></div></form></dialog>
+<script>
+(function(){
+'use strict';
+var STORE='michelle-funding-finder-v1';
+var seeds=[
+{id:'amber',name:'Monthly Amber Grant',org:'WomensNet',amount:'$15,000',kind:'Grant',category:'Women-owned business',deadline:'2026-10-31',availability:'Open',description:'Monthly award for women-owned businesses; winners are eligible for a separate annual award.',eligibility:'Women-owned businesses across industries; one application can be considered for applicable WomensNet grants. Confirm the entry fee and conditions.',url:'https://ambergrantsforwomen.com/get-an-amber-grant/'},
+{id:'amber-startup',name:'Monthly Startup Grant',org:'WomensNet',amount:'$15,000',kind:'Grant',category:'Women-owned business',deadline:'2026-10-31',availability:'Open',description:'Women founders with an idea, pre-revenue venture, or less than $10,000 in revenue.',eligibility:'WomensNet uses a common monthly application; verify startup qualifications and monthly cutoff.',url:'https://ambergrantsforwomen.com/all-grants/'},
+{id:'verizon',name:'Small Business Digital Ready Grant',org:'Verizon + LISC',amount:'$10,000',kind:'Grant',category:'Small business',deadline:'',availability:'Open',description:'Complete any two free learning events or courses, then submit one 2026 application for monthly selection.',eligibility:'U.S. for-profit small business owners age 18+; selection runs during 2026. No fixed day is represented here; check site.',url:'https://digitalready.verizonwireless.com/funding/details'},
+{id:'nase',name:'NASE Growth Grants',org:'National Association for the Self-Employed',amount:'Up to $4,000',kind:'Grant',category:'Small business',deadline:'',availability:'Rolling',description:'Member-only business growth funding for marketing, equipment, hiring and expansion.',eligibility:'NASE membership required; monthly members generally wait 90 days, annual members may qualify immediately.',url:'https://www.nase.org/become-a-member/member-benefits/business-resources/growth-grants'},
+{id:'reef-education',name:'Illinois Education and Training Grant',org:'Illinois Real Estate Educational Foundation',amount:'$100',kind:'Scholarship',category:'Real estate',deadline:'',availability:'Rolling',description:'Help with qualifying Illinois real estate pre-license education.',eligibility:'Apply prior to enrolling for eligible Illinois REALTORS courses. Verify approved courses.',url:'https://www.ilreef.org/scholarships/'},
+{id:'reef-academic',name:'REEF Real Estate Academic Scholarships',org:'Illinois Real Estate Educational Foundation',amount:'Typically $1,000–$2,000',kind:'Scholarship',category:'Business education',deadline:'',availability:'Watch',description:'Real estate and business-related academic scholarships, including Wiegers, Fitch and Seay awards.',eligibility:'2026 cycle had an April 1 cutoff. Next application date is not yet confirmed; read each scholarship’s eligibility.',url:'https://www.ilreef.org/scholarships/'},
+{id:'crew-network',name:'CREW Network Foundation Scholarships',org:'CREW Network Foundation',amount:'2026: $5,000 undergrad / $10,000 grad',kind:'Scholarship',category:'Real estate',deadline:'',availability:'Watch',description:'Funding, mentoring and networking for women pursuing commercial real estate careers.',eligibility:'2026 applications closed April 1. The next cycle and eligibility must be checked before applying.',url:'https://crewnetwork.org/crew-network-foundation/college-scholarships'},
+{id:'crew-chicago',name:'CREW Chicago Scholarship',org:'CREW Chicago',amount:'2026: $7,500',kind:'Scholarship',category:'Real estate',deadline:'',availability:'Watch',description:'Scholarship for women focusing on commercial real estate or related fields around Chicagoland.',eligibility:'2026 deadline August 31 has passed. Monitor for 2027 dates and geographic criteria.',url:'https://chicago.crewnetwork.org/get-involved/committees/scholarship'},
+{id:'goldie',name:'Goldie Scholar Program',org:'The Goldie Initiative',amount:'Scholarship + mentorship',kind:'Scholarship',category:'Real estate',deadline:'',availability:'Watch',description:'Graduate-level support and mentorship for women in commercial real estate leadership.',eligibility:'2026–27 cycle closed. Interest form for 2027–28 now available; graduate program and geographic requirements apply.',url:'https://goldieinitiative.org/scholar-program/scholar-program-overview/application/'},
+{id:'sba-7a',name:'SBA 7(a) Business Financing',org:'U.S. Small Business Administration',amount:'Loans up to $5 million',kind:'Loan',category:'Small business',deadline:'',availability:'Rolling',description:'Lender-originated loans for qualifying small businesses, including some business real estate purchases, refinancing and working capital.',eligibility:'Must be an eligible operating for-profit business with repayment capacity. This is a loan, NOT a grant.',url:'https://www.sba.gov/loans/7a-loans/'},
+{id:'sba-504',name:'SBA 504 Fixed-Asset Financing',org:'U.S. Small Business Administration',amount:'Varies by loan/project',kind:'Loan',category:'Real estate',deadline:'',availability:'Rolling',description:'Long-term financing for eligible business facilities, land and major equipment.',eligibility:'Not available for speculative or passive rental real estate investment; business use and other lending rules apply.',url:'https://www.sba.gov/loans/504-loans/'},
+{id:'illinois-grants',name:'Illinois State Grant Opportunities',org:'Illinois DCEO',amount:'Varies by program',kind:'Funding directory',category:'Small business',deadline:'',availability:'Resource',description:'Official statewide list of current grant notices, eligibility rules and links.',eligibility:'Not a single grant. Check each notice for entity eligibility and the actual closing date.',url:'https://dceo.illinois.gov/dceo-grants.html'},
+{id:'ihda',name:'Illinois Home Repair & Revitalization',org:'Illinois Housing Development Authority',amount:'Depends on program',kind:'Funding directory',category:'Real estate',deadline:'',availability:'Resource',description:'Find homeowner repair assistance and community revitalization programs delivered through local partners.',eligibility:'Many programs are limited to income-qualified owner-occupants or eligible organizations, not investment property financing.',url:'https://www.ihda.org/my-community/revitalization-programs/'}
+];
+var state={custom:[],progress:{}};
+try{var old=JSON.parse(localStorage.getItem(STORE)||'{}');if(Array.isArray(old.custom))state.custom=old.custom;if(old.progress && typeof old.progress==='object' && !Array.isArray(old.progress))state.progress=old.progress}catch(e){}
+var active='discover', editing=null;
+function $(s){return document.querySelector(s)}
+function safe(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+function safeURL(s){try{var u=new URL(s);return ['https:','http:'].indexOf(u.protocol)>=0?u.href:''}catch(e){return ''}}
+function save(){try{localStorage.setItem(STORE,JSON.stringify(state))}catch(e){alert('Browser storage unavailable. Please export a backup from My funding pipeline.')}}
+function all(){return seeds.concat(state.custom)}
+function pr(id){if(!state.progress[id])state.progress[id]={saved:false,stage:'New',notes:''};return state.progress[id]}
+function dateString(s){if(!s)return 'No confirmed date';return new Date(s+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})}
+function days(s){if(!s)return null;var p=s.split('-').map(Number);var today=new Date();return Math.round((Date.UTC(p[0],p[1]-1,p[2])-Date.UTC(today.getFullYear(),today.getMonth(),today.getDate()))/86400000)}
+function dueInfo(o){var n=days(o.deadline);if(n===null)return {text:o.availability==='Rolling'?'Rolling / ongoing':o.availability==='Watch'?'Next cycle TBD':'Check provider',cls:''};
+if(n<0)return {text:'Past: '+dateString(o.deadline),cls:'over'};
+if(n===0)return {text:'Today: '+dateString(o.deadline),cls:'soon'};
+return {text:dateString(o.deadline)+(n<=30?' · '+n+' days left':''),cls:n<=30?'soon':'good'}}
+function card(o){var p=pr(o.id),d=dueInfo(o),tag=o.category==='Women-owned business'?'women':o.category==='Real estate'?'real':o.category==='Business education'?'edu':'business';
+var options=['New','Researching','Preparing','Applied','Awarded','Not a fit'].map(function(st){return '<option'+(p.stage===st?' selected':'')+'>'+st+'</option>'}).join('');
+var link=safeURL(o.url),avail=o.availability||'Watch';
+return '<article class="card" data-id="'+safe(o.id)+'"><div class="card-top"><div class="tagrow"><span class="tag '+tag+'">'+safe(o.category)+'</span><span class="tag">'+safe(o.kind)+'</span><span class="tag">'+safe(avail)+'</span></div><button class="heart'+(p.saved?' saved':'')+'" data-action="save" aria-label="'+(p.saved?'Remove saved opportunity':'Save opportunity')+'" title="Save to my pipeline">'+(p.saved?'♥':'♡')+'</button></div>'
++'<div><h3>'+safe(o.name)+'</h3><div class="org">'+safe(o.org)+'</div></div><p class="details">'+safe(o.description)+'</p>'
++'<div class="meta"><div><span class="k">Amount / value</span><span class="v">'+safe(o.amount||'Not listed')+'</span></div><div><span class="k">Deadline</span><span class="v '+d.cls+'">'+safe(d.text)+'</span></div></div>'
++'<div class="eligibility">'+safe(o.eligibility||'Confirm eligibility with the provider.')+'</div>'
++(p.notes?'<div class="note"><strong>My notes:</strong> '+safe(p.notes)+'</div>':'')
++'<div class="card-bottom">'+(link?'<a class="btn small primary" href="'+safe(link)+'" target="_blank" rel="noopener">Official site ↗</a>':'')
++'<button class="btn small" data-action="notes">'+(p.notes?'Edit notes':'+ Notes')+'</button>'
++'<select class="stage" data-stage aria-label="Application stage">'+options+'</select>'
++(o.custom?'<button class="btn small" data-action="edit" title="Edit custom lead">Edit</button><button class="btn small" data-action="delete" title="Delete custom lead">✕</button>':'')
++'</div></article>'}
+function priority(o){var n=days(o.deadline);if(o.availability==='Open' && n!==null && n>=0)return n;if(o.availability==='Open')return 200;if(o.availability==='Rolling')return 350;if(o.availability==='Watch')return 600;if(o.availability==='Resource')return 800;return 1000}
+function render(){
+var items=all(),saved=items.filter(function(o){return pr(o.id).saved}),soon=items.filter(function(o){var d=days(o.deadline);return d!==null&&d>=0&&d<=30}).length;
+$('#countAll').textContent=items.length;$('#countSaved').textContent=saved.length;$('#countSoon').textContent=soon;$('#countActive').textContent=items.filter(function(o){return ['Researching','Preparing','Applied'].indexOf(pr(o.id).stage)>=0}).length;
+var q=$('#search').value.toLowerCase().trim(),c=$('#category').value,k=$('#kind').value;
+var filtered=items.filter(function(o){return (!c||o.category===c)&&(!k||o.kind===k)&&(!q||[o.name,o.org,o.description,o.eligibility,o.amount,o.category].join(' ').toLowerCase().includes(q))});
+var sort=$('#sort').value;
+filtered.sort(function(a,b){if(sort==='name')return a.name.localeCompare(b.name);if(sort==='deadline')return (a.deadline||'9999').localeCompare(b.deadline||'9999');return priority(a)-priority(b)||a.name.localeCompare(b.name)});
+$('#resultCount').textContent=filtered.length+' results';
+$('#discoverGrid').innerHTML=filtered.length?filtered.map(card).join(''):'<div class="empty">No matches. Try another filter or add a new opportunity.</div>';
+$('#pipelineGrid').innerHTML=saved.length?saved.sort(function(a,b){return priority(a)-priority(b)}).map(card).join(''):'<div class="empty">Your pipeline is ready. Tap ♡ on any opportunity to save it here.</div>';
+}
+function switchTab(tab){active=tab;['discover','pipeline','sources'].forEach(function(s){$('#'+s+'View').hidden=s!==tab});document.querySelectorAll('[data-tab]').forEach(function(b){b.classList.toggle('active',b.dataset.tab===tab)});render();if(tab==='sources')location.hash='sources';else if(location.hash==='#sources')history.replaceState(null,'',location.pathname)}
+document.querySelectorAll('[data-tab]').forEach(function(b){b.addEventListener('click',function(){switchTab(b.dataset.tab)})});
+$('#sourceTop').addEventListener('click',function(e){e.preventDefault();switchTab('sources')});
+['search','category','kind','sort'].forEach(function(id){$('#'+id).addEventListener(id==='search'?'input':'change',render)});
+function openForm(id){editing=id||null;$('#leadForm').reset();$('#dialogTitle').textContent=editing?'Edit opportunity':'Add an opportunity';if(editing){var o=state.custom.find(function(x){return x.id===editing});if(!o)return;[['fName','name'],['fOrg','org'],['fAmount','amount'],['fKind','kind'],['fCat','category'],['fDeadline','deadline'],['fAvail','availability'],['fUrl','url'],['fDesc','description']].forEach(function(p){$('#'+p[0]).value=o[p[1]]||''})}$('#leadDialog').showModal()}
+['newTop','newPipeline','newSources'].forEach(function(id){$('#'+id).addEventListener('click',function(){openForm()})});
+['closeDialog','cancelDialog'].forEach(function(id){$('#'+id).addEventListener('click',function(){$('#leadDialog').close()})});
+$('#leadForm').addEventListener('submit',function(e){e.preventDefault();var obj={id:editing||'custom-'+Date.now(),custom:true,name:$('#fName').value.trim(),org:$('#fOrg').value.trim(),amount:$('#fAmount').value.trim(),kind:$('#fKind').value,category:$('#fCat').value,deadline:$('#fDeadline').value,availability:$('#fAvail').value,url:safeURL($('#fUrl').value.trim()),description:$('#fDesc').value.trim(),eligibility:'Personal lead · Verify all terms with the official source.'};if(!obj.name)return; if(editing){var n=state.custom.findIndex(function(v){return v.id===editing});if(n>=0)state.custom[n]=obj}else{state.custom.push(obj);pr(obj.id).saved=true}save();$('#leadDialog').close();switchTab('pipeline')});
+document.addEventListener('click',function(e){var b=e.target.closest('[data-action]');if(!b)return;var box=b.closest('[data-id]');if(!box)return;var id=box.dataset.id,a=b.dataset.action,o=all().find(function(x){return x.id===id});if(!o)return;
+if(a==='save'){pr(id).saved=!pr(id).saved;save();render()}
+if(a==='notes'){var result=prompt('Notes for '+o.name+' (saved on this device):',pr(id).notes||'');if(result!==null){pr(id).notes=result.slice(0,3000);pr(id).saved=true;save();render()}}
+if(a==='edit')openForm(id);
+if(a==='delete'&&confirm('Delete your custom opportunity "'+o.name+'"?')){state.custom=state.custom.filter(function(x){return x.id!==id});delete state.progress[id];save();render()}
+});
+document.addEventListener('change',function(e){if(e.target.matches('[data-stage]')){var box=e.target.closest('[data-id]');pr(box.dataset.id).stage=e.target.value;if(e.target.value!=='New')pr(box.dataset.id).saved=true;save();render()}});
+function download(name,content,mime){var blob=new Blob([content],{type:mime}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(url)},1500)}
+function csv(x){return '"'+String(x==null?'':x).replace(/"/g,'""')+'"'}
+$('#exportCSV').addEventListener('click',function(){var lines=[['Name','Organization','Amount','Type','Focus','Deadline','Availability','My stage','Saved','My notes','URL'].join(',')];all().forEach(function(o){var p=pr(o.id);lines.push([o.name,o.org,o.amount,o.kind,o.category,o.deadline,o.availability,p.stage,p.saved?'Yes':'No',p.notes,o.url].map(csv).join(','))});download('michelles-funding-tracker.csv','\ufeff'+lines.join('\r\n'),'text/csv;charset=utf-8')});
+$('#exportJSON').addEventListener('click',function(){download('michelle-funding-backup-'+new Date().toISOString().slice(0,10)+'.json',JSON.stringify({version:1,savedAt:new Date().toISOString(),custom:state.custom,progress:state.progress},null,2),'application/json')});
+$('#importJSON').addEventListener('change',function(e){var f=e.target.files[0];if(!f)return;var reader=new FileReader();reader.onload=function(){try{var x=JSON.parse(reader.result);if(!Array.isArray(x.custom)||!x.progress||typeof x.progress!=='object')throw Error();if(!confirm('Restore this backup? It will replace existing notes, favorites and custom leads on this device.'))return;state.custom=x.custom.filter(function(o){return o && typeof o.name==='string' && typeof o.id==='string'}).slice(0,1000);state.progress=x.progress;save();render();alert('Backup restored.')}catch(err){alert('This is not a valid Michelle Funding Finder backup.')}};reader.readAsText(f);e.target.value=''});
+function icsEscape(x){return String(x||'').replace(/\\/g,'\\\\').replace(/\n/g,'\\n').replace(/[,;]/g,function(v){return '\\'+v})}
+$('#exportICS').addEventListener('click',function(){var list=all().filter(function(o){return o.deadline && pr(o.id).saved && days(o.deadline)>=0});if(!list.length){alert('Save an opportunity with an upcoming dated deadline first.');return}
+var lines=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Michelle Funding Finder//EN','CALSCALE:GREGORIAN'];
+list.forEach(function(o){var p=o.deadline.split('-').map(Number),next=new Date(Date.UTC(p[0],p[1]-1,p[2]+1)).toISOString().slice(0,10).replace(/-/g,'');lines.push('BEGIN:VEVENT','UID:'+o.id.replace(/[^a-z0-9-]/gi,'')+'@michellesfundingfinder','DTSTAMP:'+new Date().toISOString().replace(/[-:]/g,'').replace(/\.\d{3}/,'').replace(/\Z/,'Z'),'DTSTART;VALUE=DATE:'+o.deadline.replace(/-/g,''),'DTEND;VALUE=DATE:'+next,'SUMMARY:'+icsEscape('Funding deadline: '+o.name),'DESCRIPTION:'+icsEscape(o.org+' | '+o.amount+' | '+(o.url||'')),'END:VEVENT')});lines.push('END:VCALENDAR');download('michelle-funding-deadlines.ics',lines.join('\r\n'),'text/calendar;charset=utf-8')});
+if(location.hash==='#sources')switchTab('sources');else render();
+})();
+</script>
+</body>
+</html>
